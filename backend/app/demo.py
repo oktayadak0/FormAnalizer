@@ -1,16 +1,22 @@
 import json
 
 from .config import ROOT
-from .grounding import assemble_draft, validate_grounding, validate_missing
-from .schemas import Analysis, DraftSelection, MissingItem, MissingResult
+from .grounding import validate_grounding, validate_missing
+from .schemas import Analysis, MissingItem, MissingResult
 
 DEMO = json.loads((ROOT / "shared" / "demo.json").read_text(encoding="utf-8"))
+EXAMPLES = [DEMO, *json.loads((ROOT / "shared" / "examples.json").read_text(encoding="utf-8"))]
+
+
+def find_demo(source: str):
+    return next((sample for sample in EXAMPLES if sample["source"].strip() == source.strip()), None)
 
 
 def demo_analysis(source: str):
-    if source.strip() != DEMO["source"].strip():
-        raise ValueError("Demo yalnızca değiştirilmemiş örnek burs yönergesiyle çalışır. Kendi belgeniz için Gemma 4 gerekir.")
-    return validate_grounding(Analysis.model_validate(DEMO["analysis"]), source)
+    sample = find_demo(source)
+    if not sample:
+        raise ValueError("Demo yalnızca hazır örnek başvurularla çalışır. Kendi belgeniz için Gemma 4 gerekir.")
+    return validate_grounding(Analysis.model_validate(sample["analysis"]), source)
 
 
 def demo_missing(request):
@@ -30,17 +36,20 @@ def demo_missing(request):
 
 
 def demo_draft(request, limit):
-    # Only reorder user-authored complete lines; never manufacture a personal statement.
-    lines = [line.strip() for line in request.personal_info.splitlines() if line.strip()]
+    # Explicit offline demo: fixed sample when no facts were supplied; never claim AI use.
+    lines = [line.strip() for line in request.personal_facts().splitlines() if line.strip()]
+    sample = find_demo(request.source)
+    example = sample["question_examples"][request.requirement_id] if sample else None
+    answer = "\n".join(lines) or (example["answer"] if example else DEMO["draft_example"])
+    suggestions = []
     if len(lines) < 2:
-        selection = DraftSelection(excerpts=[], follow_up_questions=[
+        suggestions = example["suggestions"] if example else [
             "Eğitim hedefinizi bir cümleyle yazar mısınız?",
             "Bursun bu hedefe somut katkısını ayrı bir satırda yazar mısınız?",
-        ])
-    elif limit and len("\n".join(lines)) > limit:
-        selection = DraftSelection(excerpts=[], follow_up_questions=[f"Bilgilerinizi toplam {limit} karaktere sığacak şekilde kısaltır mısınız?"])
-    else:
-        selection = DraftSelection(excerpts=lines, follow_up_questions=[])
-    result = assemble_draft(selection, request.personal_info, limit)
-    result["mode"] = "demo"
-    return result
+        ]
+    if limit and len(answer) > limit:
+        answer = answer[:limit].rstrip()
+        suggestions = [f"Yanıtınızı {limit} karakter içinde daha iyi anlatmak için hangi bilgileri öne çıkarmak istersiniz?"]
+    return {"answer": answer, "follow_up_questions": suggestions, "mode": "demo",
+            "character_count": len(answer), "character_limit": limit, "generic": not bool(lines),
+            "method": "demo_example" if not lines else "user_text", "review_required": True}

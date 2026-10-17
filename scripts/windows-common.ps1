@@ -3,6 +3,9 @@ $projectRoot = Split-Path -Parent $PSScriptRoot
 $toolsDirectory = Join-Path $projectRoot '.tools'
 $ProgressPreference = 'SilentlyContinue'
 $env:PYTHONUTF8 = '1'
+$env:PYTHONUNBUFFERED = '1'
+$env:FORMDEDEKTIFI_LOG_LEVEL = 'DEBUG'
+try { [Console]::OutputEncoding = New-Object Text.UTF8Encoding($false); $OutputEncoding = [Console]::OutputEncoding } catch { }
 $env:PIP_DISABLE_PIP_VERSION_CHECK = '1'
 [Net.ServicePointManager]::SecurityProtocol = [Net.ServicePointManager]::SecurityProtocol -bor [Net.SecurityProtocolType]::Tls12
 
@@ -127,6 +130,8 @@ function Get-LocalAIConfig {
     if ($values.OLLAMA_MODEL -notin @('gemma4:e4b', 'gemma4:e2b', 'gemma4:12b', 'gemma4:26b', 'gemma4:31b')) {
         throw '.env: Desteklenen yerel bir Gemma 4 etiketi secin.'
     }
+    # Avoid slow IPv6-first localhost resolution when Ollama listens only on IPv4.
+    if ($uri.Host -eq 'localhost') { $builder = New-Object UriBuilder($uri); $builder.Host = '127.0.0.1'; $uri = $builder.Uri }
     return [pscustomobject]@{ BaseUrl = $uri.AbsoluteUri.TrimEnd('/'); Model = $values.OLLAMA_MODEL; Demo = $values.DEMO_MODE -eq 'true'; Port = $uri.Port }
 }
 
@@ -141,7 +146,7 @@ function Get-OllamaExecutable {
 function Test-OllamaServer {
     param($Config)
     try {
-        $result = Invoke-RestMethod -Uri ($Config.BaseUrl + '/api/version') -TimeoutSec 2
+        $result = Invoke-RestMethod -Uri ($Config.BaseUrl + '/api/version') -TimeoutSec 5
         return [bool]$result.version
     } catch { return $false }
 }
@@ -198,4 +203,117 @@ function Test-FormService {
         $spec = $response.Content | ConvertFrom-Json
         return $spec.info.title -eq 'FormDedektifi'
     } catch { return $false }
+}
+
+function Write-RunEvent {
+    param([string]$Message, [string]$Component = 'RUN', [ConsoleColor]$Color = 'Gray')
+    $Message = [regex]::Replace($Message, '\x1b\[[0-?]*[ -/]*[@-~]', '')
+    $Message = [regex]::Replace($Message, '[\x00-\x08\x0B\x0C\x0E-\x1F]', '')
+    if (-not $Message.Trim()) { return }
+    if ($Message.Length -gt 2000) { $Message = $Message.Substring(0, 2000) + ' [satir kisaltildi]' }
+    $line = '[{0}] [{1}] {2}' -f (Get-Date -Format 'HH:mm:ss'), $Component, $Message
+    Write-Host $line -ForegroundColor $Color
+    try {
+        $folder = Join-Path $toolsDirectory 'logs'
+        New-Item -ItemType Directory -Force -Path $folder | Out-Null
+        [IO.File]::AppendAllText((Join-Path $folder 'run.log'), $line + [Environment]::NewLine, (New-Object Text.UTF8Encoding($false)))
+    } catch { }
+}
+
+function Write-AISetupStatus {
+    param([switch]$Demo)
+    Write-RunEvent 'API key: GEREKMIYOR. Saglayici: yerel Ollama; bulut API kullanilmiyor.' 'AI' Cyan
+    if ($Demo) { Write-RunEvent 'Yalnizca arayuz/demo: canli otomatik yanit kapali.' 'AI' Yellow; return }
+    $config = Get-LocalAIConfig
+    Write-RunEvent ("Secili model: " + $config.Model) 'AI' Cyan
+    if ($config.Demo) { Write-RunEvent '.env: DEMO_MODE=true; canli yanit icin false yapin.' 'AI' Yellow; return }
+    if (-not (Test-OllamaServer $config)) {
+        $executable = Get-OllamaExecutable
+        if ($executable) { Write-RunEvent 'Ollama programi var fakat yerel servis yanit vermiyor.' 'AI' Yellow }
+        else { Write-RunEvent 'Ollama kurulumu BULUNAMADI. Gemma kurulu oldugu dogrulanamiyor.' 'AI' Yellow }
+        Write-RunEvent 'Cozum: installer.bat (tam kurulum). -Demo secenegi modeli indirmez.' 'AI' Yellow
+        return
+    }
+    try {
+        $tags = Invoke-RestMethod -Uri ($config.BaseUrl + '/api/tags') -TimeoutSec 3
+        $present = @($tags.models | Where-Object { $_.name -eq $config.Model -or $_.model -eq $config.Model }).Count -gt 0
+        if ($present) { Write-RunEvent 'Ollama: CALISIYOR. Secili Gemma: KURULU. Gercek yanit durumu uygulamada kontrol edilir.' 'AI' Green }
+        else { Write-RunEvent ("Ollama calisiyor; " + $config.Model + ' KURULU DEGIL. installer.bat ile model indirin.') 'AI' Yellow }
+    } catch { Write-RunEvent 'Ollama model listesi okunamadi; model kurulumu dogrulanamiyor.' 'AI' Yellow }
+}
+
+function Get-BackendLogDirectory {
+    param([int]$Port = 8000)
+    try {
+        $response = Invoke-WebRequest -UseBasicParsing -Uri "http://127.0.0.1:$Port/api/runtime" -TimeoutSec 3
+        # Windows PowerShell 5 otherwise decodes UTF-8 JSON paths as a legacy encoding.
+        $runtime = ([Text.Encoding]::UTF8.GetString($response.RawContentStream.ToArray())) | ConvertFrom-Json
+        if ($runtime.application -eq 'FormDedektifi' -and $runtime.project_root -and [IO.Path]::IsPathRooted($runtime.project_root)) {
+            $folder = Join-Path $runtime.project_root '.tools\logs'
+            Write-RunEvent ("Calisan backend klasoru: " + $runtime.project_root) 'BACKEND' Cyan
+            Write-RunEvent ("Canli backend kayitlari: " + $folder) 'LOG' Cyan
+            return $folder
+        }
+    } catch { }
+    Write-RunEvent 'Backend kayit klasoru dogrulanamadi. Eski backend icin kendi klasorunde run.bat -RestartBackend kullanin.' 'LOG' Yellow
+    return (Join-Path $toolsDirectory 'logs')
+}
+
+function Open-RunLogReaders {
+    param([string]$BackendLogDirectory = (Join-Path $toolsDirectory 'logs'), [switch]$SkipBackend, [switch]$SkipFrontend, [switch]$IncludeOllama)
+    $readers = @()
+    $files = @()
+    if (-not $SkipBackend) { $files += @(
+        [pscustomobject]@{ Name = 'backend.log'; Path = (Join-Path $BackendLogDirectory 'backend.log') },
+        [pscustomobject]@{ Name = 'backend-error.log'; Path = (Join-Path $BackendLogDirectory 'backend-error.log') }
+    ) }
+    if (-not $SkipFrontend) { $files += [pscustomobject]@{ Name = 'frontend-error.log'; Path = (Join-Path $toolsDirectory 'logs\frontend-error.log') } }
+    if ($IncludeOllama) { $files += [pscustomobject]@{ Name = 'ollama-error.log'; Path = (Join-Path $toolsDirectory 'logs\ollama-error.log') } }
+    foreach ($file in $files) {
+        $name = $file.Name
+        $path = $file.Path
+        try {
+            if (-not (Test-Path -LiteralPath $path)) { continue }
+            # Follow only new events; old smoke-test/bind errors belong to earlier runs.
+            $stream = New-Object IO.FileStream($path, [IO.FileMode]::Open, [IO.FileAccess]::Read, ([IO.FileShare]::ReadWrite -bor [IO.FileShare]::Delete))
+            $null = $stream.Seek(0, [IO.SeekOrigin]::End)
+            $reader = New-Object IO.StreamReader($stream, [Text.Encoding]::UTF8)
+            $readers += [pscustomobject]@{ Name = $name; Reader = $reader }
+        } catch { Write-RunEvent ("Kayit henuz acilamadi: " + $name) 'LOG' Yellow }
+    }
+    return $readers
+}
+
+function Show-NewRunLogs {
+    param($Readers)
+    foreach ($entry in $Readers) {
+        try {
+            if ($entry.Reader.BaseStream.Position -gt $entry.Reader.BaseStream.Length) {
+                $entry.Reader.DiscardBufferedData()
+                $null = $entry.Reader.BaseStream.Seek(0, [IO.SeekOrigin]::Begin)
+            }
+            $count = 0
+            while (-not $entry.Reader.EndOfStream -and $count -lt 100) {
+                $line = $entry.Reader.ReadLine()
+                if ($null -ne $line -and $line.Trim()) { Write-RunEvent $line $entry.Name }
+                $count++
+            }
+        } catch { }
+    }
+}
+
+function Stop-ProjectBackend {
+    param([int]$Port, [string]$PythonExecutable)
+    $listeners = Get-NetTCPConnection -LocalPort $Port -State Listen -ErrorAction Stop
+    foreach ($owner in @($listeners.OwningProcess | Select-Object -Unique)) {
+        $process = Get-CimInstance Win32_Process -Filter "ProcessId=$owner" -ErrorAction Stop
+        $command = [string]$process.CommandLine
+        $matchesPython = [string]::Equals($process.ExecutablePath, $PythonExecutable, [StringComparison]::OrdinalIgnoreCase) -or $command.StartsWith(('"' + $PythonExecutable + '" '), [StringComparison]::OrdinalIgnoreCase) -or $command.StartsWith(($PythonExecutable + ' '), [StringComparison]::OrdinalIgnoreCase)
+        if (-not $matchesPython -or $command -notmatch '-m\s+uvicorn\s+backend\.app\.main:app\b') {
+            throw 'Calisan backend bu projenin Python islemi olarak dogrulanamadi. Onu kendi terminalinden kapatin.'
+        }
+        Write-RunEvent ("Bu projeye ait backend yeniden baslatiliyor. PID=" + $owner) 'BACKEND' Yellow
+        Stop-Process -Id $owner -ErrorAction Stop
+        Wait-Process -Id $owner -Timeout 5 -ErrorAction SilentlyContinue
+    }
 }

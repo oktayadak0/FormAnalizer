@@ -45,6 +45,33 @@ Yalnızca frontend gerekiyorsa `run.bat -Demo` kullanın.
 
 ## Tanılama
 
+`run.bat` artık varsayılan olarak canlı debug konsoludur. Açılışta proje klasörü, runtime sürümleri, seçili Gemma etiketi, Ollama erişimi, modelin kurulu olup olmadığı ve **API key gerekmediği** yazılır. Sonrasında istek yolları, HTTP durumları, süreler ve güvenli hata kodları izlenir. Kaynak belge, kişisel bilgi, modelin yanıtı ve düşünme içeriği loglanmaz.
+
+- Toplu konsol kaydı: `.tools/logs/run.log`
+- Yapılandırılmış backend kaydı: `.tools/logs/backend-events.log`
+- Arayüz hatasının `[Tanı: ...]` numarası, backend kaydındaki `request=...` ile aynıdır.
+- `model_missing`: seçili etiket indirilmemiş; `ollama_unreachable`: yerel servis erişilemiyor; `ollama_timeout`: süre aşıldı; `model_output_invalid`: şema/kaynak doğrulaması geçmedi.
+
+Başlatıcı, `/api/runtime` üzerinden çalışan backend'in gerçek klasörünü öğrenir. Örneğin `FormAnalizer` içinden başlatılıp üst klasördeki backend kullanılıyorsa o backend'in logları izlenir. UTF-8 JSON yolları Windows PowerShell 5'te de Türkçe klasör adlarıyla okunur. Başlatıcı eski `ONCEKI` kayıtlarını tekrar basmaz; yalnızca yeni olayları gösterir. Daha önceki testlerden kalan Ollama port hatası yeni bir hata gibi gösterilmez.
+
+Özel PDF analizinde kaynak alıntıları modelin yeniden yazdığı metinden değil, modelin seçtiği özgün belge bölümlerinden alınır. Böylece PDF'deki satır kırılmaları ve bölünmez boşluklar kaynak doğrulamasını bozmaz. Geçersiz bölüm numarası veya kaynakta desteklenmeyen limit/tarih güvenli hata kodlarıyla loglanır. Analiz sürerken bağlantı kontrolü ek bir model çağrısı başlatmaz. Küçük belgeler 8192 bağlamla işlenir; analiz düğmesinde geçen süre görünür. Dosya yükledikten sonra **Başvurumu Analiz Et** düğmesine basın.
+
+Eski bir backend arka planda kalmışsa yalnızca bu projenin Python işlemi doğrulandıktan sonra yeniden başlatılabilir:
+
+```bat
+run.bat -RestartBackend
+```
+
+Başka bir projeye ait işlem doğrulanmadan kapatılmaz. Önceden açılmış servisler normal çalıştırmada korunur; konsol yeni kayıtları izlemeye devam eder. Kontrol karakterleri temizlenir ve aşırı uzun satırlar kısaltılır.
+
+17 Ekim 2026 son tanısında bilgisayarda `gemma4:e2b` bulunurken `.env` E4B istiyordu. İki yerel proje kopyasının `.env` dosyası kurulu E2B modeline ayarlandı. Yerel API adresinde Windows'un IPv6 öncelemesinden kaynaklanabilecek gecikmeyi önlemek için `127.0.0.1` kullanıldı. Model başka bir aileyle değiştirilmedi.
+
+Gemma 4'ün düşünme modu, kısa JSON sağlık kontrolünün çıktı sınırını tüketebildiği için yapılandırılmış çağrılarda açıkça `think:false` kullanılır. Sağlık ve taslak çağrıları aynı 8192 token bağlamını kullanarak gereksiz model yeniden yüklemesini azaltır. Paralel sağlık kontrolleri tek bir model probunu paylaşır ve kullanıcı taslak slotlarını tüketmez.
+
+Yanıt asistanında örnek analiziyle başlamış olsanız da **Taslağı gerçek Gemma 4 ile oluştur** seçeneği varsayılan olarak açıktır. Düğme canlı modele soruyu iletir ve yeni bir paragraf yazdırır. Bilgi alanını boş bırakabilirsiniz: bu durumda model genel bir öneri üretir ve yanıtın altında kişisel bilgi verilmediği belirtilir. Bilgi eklerseniz yanıt buna göre yazılır. Ek sorular, yanıt alanının altında **Şu soruları da yanıtlarsanız taslağınız güçlenir** başlığıyla isteğe bağlı öneriler olarak görünür. Boş şablon ve köşeli parantezli yer tutucu yanıtlar kabul edilmez; modelden yeniden üretim istenir. Model erişilemiyorsa hata gösterilir, demo sessizce devreye girmez. Gerçek modeli açıkça kapatırsanız demo hazır örnek yanıtı veya kendi metninizi gösterir. Model çalışırken geçen süre gösterilir.
+
+Öneri sorularının altında cevap alanları bulunur. En az bir cevap yazınca **Yanıtlarımla taslağı güncelle** düğmesi kullanılabilir. Bu işlem mevcut bilgileri ve ek cevapları birleştirerek yalnızca ilgili form sorusunun yanıtını yeniden üretir. Cevaplar güncellemeden sonra düzenlenebilir halde kalır; model hatasında önceki taslak silinmez. Cevap metinleri loglanmaz, yalnızca yanıtlanan soru sayısı kaydedilir.
+
 Bağımlılıkların varlığını indirme veya değişiklik yapmadan kontrol edin:
 
 ```bat

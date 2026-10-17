@@ -1,7 +1,7 @@
 from datetime import datetime
-from typing import Literal
+from typing import Annotated, Literal
 
-from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
+from pydantic import BaseModel, ConfigDict, Field, create_model, field_validator, model_validator
 
 
 class Schema(BaseModel):
@@ -46,6 +46,25 @@ class Analysis(Schema):
         return self
 
 
+def referenced_schema(model, name):
+    fields = {key: (field.annotation, field) for key, field in model.model_fields.items() if key != "evidence"}
+    fields["evidence_id"] = (int, Field(ge=0))
+    return create_model(name, __base__=Schema, **fields)
+
+
+ReferencedRequirement = referenced_schema(Requirement, "ReferencedRequirement")
+ReferencedAmbiguity = referenced_schema(Ambiguity, "ReferencedAmbiguity")
+
+
+class ReferencedAnalysis(Schema):
+    name: str = Field(min_length=1, max_length=200)
+    name_evidence_id: int = Field(ge=0)
+    purpose: str = Field(min_length=1, max_length=1500)
+    purpose_evidence_id: int = Field(ge=0)
+    requirements: list[ReferencedRequirement] = Field(min_length=1, max_length=120)
+    ambiguities: list[ReferencedAmbiguity] = Field(max_length=30)
+
+
 class AnalyzeRequest(Schema):
     source: str = Field(min_length=30, max_length=40000)
     demo: bool = False
@@ -83,15 +102,37 @@ class MissingResult(Schema):
     items: list[MissingItem] = Field(max_length=120)
 
 
+class FollowUpAnswer(Schema):
+    question: str = Field(min_length=1, max_length=500)
+    answer: str = Field(min_length=1, max_length=1500)
+
+
 class DraftRequest(ContextRequest):
     requirement_id: str = Field(max_length=80)
     personal_info: str = Field(max_length=6000)
+    follow_up_answers: list[FollowUpAnswer] = Field(default_factory=list, max_length=20)
+
+    def personal_facts(self):
+        return "\n".join(part for part in [self.personal_info, *[item.answer for item in self.follow_up_answers]] if part)
+
+    @model_validator(mode="after")
+    def combined_information_limit(self):
+        if len(self.personal_facts()) > 6000:
+            raise ValueError("Kişisel bilgiler ve ek yanıtlar toplam en fazla 6.000 karakter olmalıdır.")
+        return self
 
 
-class DraftSelection(Schema):
-    # Exact user quotes are intentional: free paraphrases cannot be verified locally.
-    excerpts: list[str] = Field(max_length=20)
-    follow_up_questions: list[str] = Field(max_length=5)
+class GeneratedDraft(Schema):
+    answer: str = Field(min_length=1, max_length=6000)
+    supporting_facts: list[str] = Field(max_length=20)
+    follow_up_questions: list[Annotated[str, Field(min_length=1, max_length=500)]] = Field(max_length=5)
+
+
+def draft_schema(personal_info: str, limit: int | None):
+    # Give Ollama the actual answer bound; without personal input no personal evidence is allowed.
+    return create_model("GeneratedDraft", __base__=GeneratedDraft,
+        answer=(str, Field(min_length=1, max_length=min(limit or 6000, 6000))),
+        supporting_facts=(list[str], Field(max_length=20 if personal_info.strip() else 0)))
 
 
 class Ping(Schema):

@@ -1,0 +1,1430 @@
+[
+  {
+    "id": "yazilim-staji",
+    "category": "Staj",
+    "filename": "yazilim-staji-2026.txt",
+    "source": "Kod Rotası Yazılım Stajı 2026 — Örnek Başvuru Yönergesi\nBu yönerge yalnızca FormDedektifi demosu için oluşturulmuştur; gerçek bir ilan değildir.\nKod Rotası Yazılım Stajı, öğrencilerin yazılım geliştirme sürecini tanımasını ve uygulama becerilerini geliştirmesini amaçlar.\nBaşvuranın üniversite öğrencisi olması ve haftada en az iki gün ayırabilmesi gerekir.\nGüncel özgeçmiş PDF formatında yüklenmelidir.\n“Bu staja neden katılmak istiyorsun?” sorusuna en fazla 500 karakterle yanıt verilmelidir.\n“Öğrenmek istediğin teknik beceriler nelerdir?” sorusuna en fazla 600 karakterle yanıt verilmelidir.\n“Takım içinde bir sorunla karşılaştığında nasıl ilerlersin?” sorusuna en fazla 450 karakterle yanıt verilmelidir.\nAd, soyad ve e-posta adresi başvuru formunda doldurulmalıdır.\nSon başvuru tarihi 2 Aralık 2026, saat 18.00'dır (Türkiye saati).\nBaşvuru, örnek programın çevrim içi formu üzerinden gönderilmelidir.\nEklerin toplam boyutu en fazla 8 MB olmalıdır.",
+    "question_examples": {
+      "question_1": {
+        "answer": "Yazılım geliştirme sürecini gerçekçi görevlerle tanımak ve öğrendiklerimi uygulamak istiyorum. Düzenli geri bildirim alarak çalışma alışkanlıklarımı geliştirmeyi amaçlıyorum.",
+        "suggestions": [
+          "Bu yanıtı kendi hedefinizden bir örnekle nasıl somutlaştırabilirsiniz?",
+          "Eklemek istediğiniz kişisel bir bilgi veya plan var mı?"
+        ]
+      },
+      "question_2": {
+        "answer": "Temiz kod yazma, sürüm kontrolü ve test hazırlama konularında gelişmek istiyorum. Küçük bir uygulamayı planlamadan teslim aşamasına kadar ilerleterek bu becerileri pekiştirmeyi hedefliyorum.",
+        "suggestions": [
+          "Bu yanıtı kendi hedefinizden bir örnekle nasıl somutlaştırabilirsiniz?",
+          "Eklemek istediğiniz kişisel bir bilgi veya plan var mı?"
+        ]
+      },
+      "question_3": {
+        "answer": "Önce sorunun nedenini anlamaya ve ortak hedefi netleştirmeye çalışırım. Çözüm seçeneklerini ekiple konuşup geri bildirime açık biçimde adım adım ilerlemeyi tercih ederim.",
+        "suggestions": [
+          "Bu yanıtı kendi hedefinizden bir örnekle nasıl somutlaştırabilirsiniz?",
+          "Eklemek istediğiniz kişisel bir bilgi veya plan var mı?"
+        ]
+      }
+    },
+    "analysis": {
+      "name": "Kod Rotası Yazılım Stajı 2026",
+      "name_evidence": "Kod Rotası Yazılım Stajı 2026 — Örnek Başvuru Yönergesi",
+      "purpose": "Öğrencilerin yazılım geliştirme sürecini tanımasını ve uygulama becerilerini geliştirmesini amaçlar.",
+      "purpose_evidence": "Kod Rotası Yazılım Stajı, öğrencilerin yazılım geliştirme sürecini tanımasını ve uygulama becerilerini geliştirmesini amaçlar.",
+      "requirements": [
+        {
+          "id": "eligibility",
+          "kind": "eligibility",
+          "description": "Başvuranın üniversite öğrencisi olması ve haftada en az iki gün ayırabilmesi gerekir.",
+          "evidence": "Başvuranın üniversite öğrencisi olması ve haftada en az iki gün ayırabilmesi gerekir.",
+          "required": true,
+          "character_limit": null,
+          "deadline": null
+        },
+        {
+          "id": "document",
+          "kind": "document",
+          "description": "Güncel özgeçmiş PDF formatında yüklenmelidir.",
+          "evidence": "Güncel özgeçmiş PDF formatında yüklenmelidir.",
+          "required": true,
+          "character_limit": null,
+          "deadline": null
+        },
+        {
+          "id": "question_1",
+          "kind": "question",
+          "description": "Bu staja neden katılmak istiyorsun?",
+          "evidence": "“Bu staja neden katılmak istiyorsun?” sorusuna en fazla 500 karakterle yanıt verilmelidir.",
+          "required": true,
+          "character_limit": 500,
+          "deadline": null
+        },
+        {
+          "id": "question_2",
+          "kind": "question",
+          "description": "Öğrenmek istediğin teknik beceriler nelerdir?",
+          "evidence": "“Öğrenmek istediğin teknik beceriler nelerdir?” sorusuna en fazla 600 karakterle yanıt verilmelidir.",
+          "required": true,
+          "character_limit": 600,
+          "deadline": null
+        },
+        {
+          "id": "question_3",
+          "kind": "question",
+          "description": "Takım içinde bir sorunla karşılaştığında nasıl ilerlersin?",
+          "evidence": "“Takım içinde bir sorunla karşılaştığında nasıl ilerlersin?” sorusuna en fazla 450 karakterle yanıt verilmelidir.",
+          "required": true,
+          "character_limit": 450,
+          "deadline": null
+        },
+        {
+          "id": "identity",
+          "kind": "field",
+          "description": "Ad, soyad ve e-posta adresi",
+          "evidence": "Ad, soyad ve e-posta adresi başvuru formunda doldurulmalıdır.",
+          "required": true,
+          "character_limit": null,
+          "deadline": null
+        },
+        {
+          "id": "deadline",
+          "kind": "deadline",
+          "description": "2 Aralık 2026 · 18.00",
+          "evidence": "Son başvuru tarihi 2 Aralık 2026, saat 18.00'dır (Türkiye saati).",
+          "required": true,
+          "character_limit": null,
+          "deadline": "2026-12-02T18:00:00+03:00"
+        },
+        {
+          "id": "submission",
+          "kind": "submission",
+          "description": "Çevrim içi başvuru formundan gönder",
+          "evidence": "Başvuru, örnek programın çevrim içi formu üzerinden gönderilmelidir.",
+          "required": true,
+          "character_limit": null,
+          "deadline": null
+        },
+        {
+          "id": "format",
+          "kind": "format",
+          "description": "Ekler en fazla 8 MB",
+          "evidence": "Eklerin toplam boyutu en fazla 8 MB olmalıdır.",
+          "required": true,
+          "character_limit": null,
+          "deadline": null
+        }
+      ],
+      "ambiguities": []
+    }
+  },
+  {
+    "id": "yapay-zeka-hackathon",
+    "category": "Hackathon",
+    "filename": "yapay-zeka-hackathon-2026.txt",
+    "source": "Fırat Yapay Zekâ Hackathonu 2026 — Örnek Başvuru Yönergesi\nBu yönerge yalnızca FormDedektifi demosu için oluşturulmuştur; gerçek bir ilan değildir.\nFırat Yapay Zekâ Hackathonu, günlük yaşam sorunlarına sorumlu yapay zekâ çözümleri geliştirmeyi amaçlar.\nTakımlar iki ila dört kişiden oluşmalı ve en az bir üyesi üniversite öğrencisi olmalıdır.\nBir sayfalık proje özeti PDF olarak eklenmelidir.\n“Hangi problemi çözmek istiyorsunuz?” sorusuna en fazla 500 karakterle yanıt verilmelidir.\n“Yapay zekâyı çözümünüzde nasıl kullanacaksınız?” sorusuna en fazla 600 karakterle yanıt verilmelidir.\n“Etkinlik sonunda nasıl bir prototip sunmayı hedefliyorsunuz?” sorusuna en fazla 450 karakterle yanıt verilmelidir.\nAd, soyad ve e-posta adresi başvuru formunda doldurulmalıdır.\nSon başvuru tarihi 3 Aralık 2026, saat 18.00'dır (Türkiye saati).\nBaşvuru, örnek programın çevrim içi formu üzerinden gönderilmelidir.\nEklerin toplam boyutu en fazla 8 MB olmalıdır.",
+    "question_examples": {
+      "question_1": {
+        "answer": "Karmaşık bilgilerin anlaşılmasını kolaylaştıran bir araç tasarlamak istiyoruz. Çözümü kullanıcıların ihtiyaçlarına göre küçük bir kapsamla başlatıp geri bildirimlerle geliştirmeyi amaçlıyoruz.",
+        "suggestions": [
+          "Bu yanıtı kendi hedefinizden bir örnekle nasıl somutlaştırabilirsiniz?",
+          "Eklemek istediğiniz kişisel bir bilgi veya plan var mı?"
+        ]
+      },
+      "question_2": {
+        "answer": "Yapay zekâyı bilgileri sadeleştirmek ve kullanıcıya öneriler sunmak için kullanmayı planlıyoruz. Kritik sonuçları kullanıcı kontrolüne açarak belirsizlikleri görünür tutmak istiyoruz.",
+        "suggestions": [
+          "Bu yanıtı kendi hedefinizden bir örnekle nasıl somutlaştırabilirsiniz?",
+          "Eklemek istediğiniz kişisel bir bilgi veya plan var mı?"
+        ]
+      },
+      "question_3": {
+        "answer": "Temel kullanıcı akışını çalıştıran küçük bir prototip sunmayı hedefliyoruz. Demoda problemi, çözümün sınırlarını ve geliştirme için topladığımız geri bildirimleri açıkça göstermek istiyoruz.",
+        "suggestions": [
+          "Bu yanıtı kendi hedefinizden bir örnekle nasıl somutlaştırabilirsiniz?",
+          "Eklemek istediğiniz kişisel bir bilgi veya plan var mı?"
+        ]
+      }
+    },
+    "analysis": {
+      "name": "Fırat Yapay Zekâ Hackathonu 2026",
+      "name_evidence": "Fırat Yapay Zekâ Hackathonu 2026 — Örnek Başvuru Yönergesi",
+      "purpose": "Günlük yaşam sorunlarına sorumlu yapay zekâ çözümleri geliştirmeyi amaçlar.",
+      "purpose_evidence": "Fırat Yapay Zekâ Hackathonu, günlük yaşam sorunlarına sorumlu yapay zekâ çözümleri geliştirmeyi amaçlar.",
+      "requirements": [
+        {
+          "id": "eligibility",
+          "kind": "eligibility",
+          "description": "Takımlar iki ila dört kişiden oluşmalı ve en az bir üyesi üniversite öğrencisi olmalıdır.",
+          "evidence": "Takımlar iki ila dört kişiden oluşmalı ve en az bir üyesi üniversite öğrencisi olmalıdır.",
+          "required": true,
+          "character_limit": null,
+          "deadline": null
+        },
+        {
+          "id": "document",
+          "kind": "document",
+          "description": "Bir sayfalık proje özeti PDF olarak eklenmelidir.",
+          "evidence": "Bir sayfalık proje özeti PDF olarak eklenmelidir.",
+          "required": true,
+          "character_limit": null,
+          "deadline": null
+        },
+        {
+          "id": "question_1",
+          "kind": "question",
+          "description": "Hangi problemi çözmek istiyorsunuz?",
+          "evidence": "“Hangi problemi çözmek istiyorsunuz?” sorusuna en fazla 500 karakterle yanıt verilmelidir.",
+          "required": true,
+          "character_limit": 500,
+          "deadline": null
+        },
+        {
+          "id": "question_2",
+          "kind": "question",
+          "description": "Yapay zekâyı çözümünüzde nasıl kullanacaksınız?",
+          "evidence": "“Yapay zekâyı çözümünüzde nasıl kullanacaksınız?” sorusuna en fazla 600 karakterle yanıt verilmelidir.",
+          "required": true,
+          "character_limit": 600,
+          "deadline": null
+        },
+        {
+          "id": "question_3",
+          "kind": "question",
+          "description": "Etkinlik sonunda nasıl bir prototip sunmayı hedefliyorsunuz?",
+          "evidence": "“Etkinlik sonunda nasıl bir prototip sunmayı hedefliyorsunuz?” sorusuna en fazla 450 karakterle yanıt verilmelidir.",
+          "required": true,
+          "character_limit": 450,
+          "deadline": null
+        },
+        {
+          "id": "identity",
+          "kind": "field",
+          "description": "Ad, soyad ve e-posta adresi",
+          "evidence": "Ad, soyad ve e-posta adresi başvuru formunda doldurulmalıdır.",
+          "required": true,
+          "character_limit": null,
+          "deadline": null
+        },
+        {
+          "id": "deadline",
+          "kind": "deadline",
+          "description": "3 Aralık 2026 · 18.00",
+          "evidence": "Son başvuru tarihi 3 Aralık 2026, saat 18.00'dır (Türkiye saati).",
+          "required": true,
+          "character_limit": null,
+          "deadline": "2026-12-03T18:00:00+03:00"
+        },
+        {
+          "id": "submission",
+          "kind": "submission",
+          "description": "Çevrim içi başvuru formundan gönder",
+          "evidence": "Başvuru, örnek programın çevrim içi formu üzerinden gönderilmelidir.",
+          "required": true,
+          "character_limit": null,
+          "deadline": null
+        },
+        {
+          "id": "format",
+          "kind": "format",
+          "description": "Ekler en fazla 8 MB",
+          "evidence": "Eklerin toplam boyutu en fazla 8 MB olmalıdır.",
+          "required": true,
+          "character_limit": null,
+          "deadline": null
+        }
+      ],
+      "ambiguities": []
+    }
+  },
+  {
+    "id": "gonulluluk",
+    "category": "Gönüllülük",
+    "filename": "gonulluluk-2026.txt",
+    "source": "Birlikte Öğren Gönüllülük Programı 2026 — Örnek Başvuru Yönergesi\nBu yönerge yalnızca FormDedektifi demosu için oluşturulmuştur; gerçek bir ilan değildir.\nBirlikte Öğren Gönüllülük Programı, gönüllülerin eğitim etkinlikleriyle toplumsal dayanışmaya katkı sağlamasını amaçlar.\nKatılımcıların ayda en az dört saat gönüllülük çalışmalarına ayırabilmesi gerekir.\nKısa katılım niyeti metni PDF formatında eklenmelidir.\n“Bu gönüllülük programına neden katılmak istiyorsun?” sorusuna en fazla 500 karakterle yanıt verilmelidir.\n“Hangi etkinliklere katkı sunmak istersin?” sorusuna en fazla 600 karakterle yanıt verilmelidir.\n“Katılımcılarla iletişimde nelere dikkat edersin?” sorusuna en fazla 450 karakterle yanıt verilmelidir.\nAd, soyad ve e-posta adresi başvuru formunda doldurulmalıdır.\nSon başvuru tarihi 4 Aralık 2026, saat 18.00'dır (Türkiye saati).\nBaşvuru, örnek programın çevrim içi formu üzerinden gönderilmelidir.\nEklerin toplam boyutu en fazla 8 MB olmalıdır.",
+    "question_examples": {
+      "question_1": {
+        "answer": "Bilgi paylaşımı ve birlikte öğrenme yoluyla fayda sağlamayı amaçlıyorum. İhtiyaçları dinleyerek küçük ama sürdürülebilir katkılar sunmak istiyorum.",
+        "suggestions": [
+          "Bu yanıtı kendi hedefinizden bir örnekle nasıl somutlaştırabilirsiniz?",
+          "Eklemek istediğiniz kişisel bir bilgi veya plan var mı?"
+        ]
+      },
+      "question_2": {
+        "answer": "Öğrenme atölyelerinin hazırlanmasına ve anlaşılır eğitim materyallerinin oluşturulmasına katkı sunmak isterim. Görevleri ekiple birlikte planlayarak düzenli biçimde takip etmeyi amaçlıyorum.",
+        "suggestions": [
+          "Bu yanıtı kendi hedefinizden bir örnekle nasıl somutlaştırabilirsiniz?",
+          "Eklemek istediğiniz kişisel bir bilgi veya plan var mı?"
+        ]
+      },
+      "question_3": {
+        "answer": "Saygılı ve açık iletişim kurmaya, kişilerin ihtiyaçlarını dinlemeye dikkat ederim. Herkesin soru sorabildiği ve kendini rahatça ifade edebildiği bir ortam oluşturmayı önemserim.",
+        "suggestions": [
+          "Bu yanıtı kendi hedefinizden bir örnekle nasıl somutlaştırabilirsiniz?",
+          "Eklemek istediğiniz kişisel bir bilgi veya plan var mı?"
+        ]
+      }
+    },
+    "analysis": {
+      "name": "Birlikte Öğren Gönüllülük Programı 2026",
+      "name_evidence": "Birlikte Öğren Gönüllülük Programı 2026 — Örnek Başvuru Yönergesi",
+      "purpose": "Gönüllülerin eğitim etkinlikleriyle toplumsal dayanışmaya katkı sağlamasını amaçlar.",
+      "purpose_evidence": "Birlikte Öğren Gönüllülük Programı, gönüllülerin eğitim etkinlikleriyle toplumsal dayanışmaya katkı sağlamasını amaçlar.",
+      "requirements": [
+        {
+          "id": "eligibility",
+          "kind": "eligibility",
+          "description": "Katılımcıların ayda en az dört saat gönüllülük çalışmalarına ayırabilmesi gerekir.",
+          "evidence": "Katılımcıların ayda en az dört saat gönüllülük çalışmalarına ayırabilmesi gerekir.",
+          "required": true,
+          "character_limit": null,
+          "deadline": null
+        },
+        {
+          "id": "document",
+          "kind": "document",
+          "description": "Kısa katılım niyeti metni PDF formatında eklenmelidir.",
+          "evidence": "Kısa katılım niyeti metni PDF formatında eklenmelidir.",
+          "required": true,
+          "character_limit": null,
+          "deadline": null
+        },
+        {
+          "id": "question_1",
+          "kind": "question",
+          "description": "Bu gönüllülük programına neden katılmak istiyorsun?",
+          "evidence": "“Bu gönüllülük programına neden katılmak istiyorsun?” sorusuna en fazla 500 karakterle yanıt verilmelidir.",
+          "required": true,
+          "character_limit": 500,
+          "deadline": null
+        },
+        {
+          "id": "question_2",
+          "kind": "question",
+          "description": "Hangi etkinliklere katkı sunmak istersin?",
+          "evidence": "“Hangi etkinliklere katkı sunmak istersin?” sorusuna en fazla 600 karakterle yanıt verilmelidir.",
+          "required": true,
+          "character_limit": 600,
+          "deadline": null
+        },
+        {
+          "id": "question_3",
+          "kind": "question",
+          "description": "Katılımcılarla iletişimde nelere dikkat edersin?",
+          "evidence": "“Katılımcılarla iletişimde nelere dikkat edersin?” sorusuna en fazla 450 karakterle yanıt verilmelidir.",
+          "required": true,
+          "character_limit": 450,
+          "deadline": null
+        },
+        {
+          "id": "identity",
+          "kind": "field",
+          "description": "Ad, soyad ve e-posta adresi",
+          "evidence": "Ad, soyad ve e-posta adresi başvuru formunda doldurulmalıdır.",
+          "required": true,
+          "character_limit": null,
+          "deadline": null
+        },
+        {
+          "id": "deadline",
+          "kind": "deadline",
+          "description": "4 Aralık 2026 · 18.00",
+          "evidence": "Son başvuru tarihi 4 Aralık 2026, saat 18.00'dır (Türkiye saati).",
+          "required": true,
+          "character_limit": null,
+          "deadline": "2026-12-04T18:00:00+03:00"
+        },
+        {
+          "id": "submission",
+          "kind": "submission",
+          "description": "Çevrim içi başvuru formundan gönder",
+          "evidence": "Başvuru, örnek programın çevrim içi formu üzerinden gönderilmelidir.",
+          "required": true,
+          "character_limit": null,
+          "deadline": null
+        },
+        {
+          "id": "format",
+          "kind": "format",
+          "description": "Ekler en fazla 8 MB",
+          "evidence": "Eklerin toplam boyutu en fazla 8 MB olmalıdır.",
+          "required": true,
+          "character_limit": null,
+          "deadline": null
+        }
+      ],
+      "ambiguities": []
+    }
+  },
+  {
+    "id": "girisimcilik",
+    "category": "Girişimcilik",
+    "filename": "girisimcilik-2026.txt",
+    "source": "İlk Adım Girişimcilik Kampı 2026 — Örnek Başvuru Yönergesi\nBu yönerge yalnızca FormDedektifi demosu için oluşturulmuştur; gerçek bir ilan değildir.\nİlk Adım Girişimcilik Kampı, erken aşama fikirlerin kullanıcı ihtiyacına göre geliştirilmesini amaçlar.\nBaşvuranın henüz şirketleşmemiş bir fikir üzerinde çalışmak istemesi gerekir.\nBir sayfalık fikir tanıtımı PDF olarak yüklenmelidir.\n“Fikrin hangi kullanıcı ihtiyacına çözüm getiriyor?” sorusuna en fazla 500 karakterle yanıt verilmelidir.\n“Fikrini doğrulamak için nasıl bir çalışma yaparsın?” sorusuna en fazla 600 karakterle yanıt verilmelidir.\n“Kamptan hangi kazanımlarla ayrılmak istiyorsun?” sorusuna en fazla 450 karakterle yanıt verilmelidir.\nAd, soyad ve e-posta adresi başvuru formunda doldurulmalıdır.\nSon başvuru tarihi 5 Aralık 2026, saat 18.00'dır (Türkiye saati).\nBaşvuru, örnek programın çevrim içi formu üzerinden gönderilmelidir.\nEklerin toplam boyutu en fazla 8 MB olmalıdır.",
+    "question_examples": {
+      "question_1": {
+        "answer": "Kullanıcıların bilgiye erişirken yaşadığı karmaşayı azaltan bir çözüm geliştirmek istiyorum. Önce belirli bir kullanıcı grubunun ihtiyacını anlayıp tek bir temel soruna odaklanmayı planlıyorum.",
+        "suggestions": [
+          "Bu yanıtı kendi hedefinizden bir örnekle nasıl somutlaştırabilirsiniz?",
+          "Eklemek istediğiniz kişisel bir bilgi veya plan var mı?"
+        ]
+      },
+      "question_2": {
+        "answer": "Potansiyel kullanıcılarla görüşmeler yapıp mevcut yöntemlerini ve zorlandıkları noktaları anlamayı planlıyorum. Küçük bir prototiple geri bildirim toplayarak varsayımlarımı sınamak istiyorum.",
+        "suggestions": [
+          "Bu yanıtı kendi hedefinizden bir örnekle nasıl somutlaştırabilirsiniz?",
+          "Eklemek istediğiniz kişisel bir bilgi veya plan var mı?"
+        ]
+      },
+      "question_3": {
+        "answer": "Problem tanımı, kullanıcı araştırması ve prototip hazırlama konusunda daha sistemli çalışmayı öğrenmek istiyorum. Kamp sonunda sonraki adımları belli olan uygulanabilir bir plan oluşturmayı hedefliyorum.",
+        "suggestions": [
+          "Bu yanıtı kendi hedefinizden bir örnekle nasıl somutlaştırabilirsiniz?",
+          "Eklemek istediğiniz kişisel bir bilgi veya plan var mı?"
+        ]
+      }
+    },
+    "analysis": {
+      "name": "İlk Adım Girişimcilik Kampı 2026",
+      "name_evidence": "İlk Adım Girişimcilik Kampı 2026 — Örnek Başvuru Yönergesi",
+      "purpose": "Erken aşama fikirlerin kullanıcı ihtiyacına göre geliştirilmesini amaçlar.",
+      "purpose_evidence": "İlk Adım Girişimcilik Kampı, erken aşama fikirlerin kullanıcı ihtiyacına göre geliştirilmesini amaçlar.",
+      "requirements": [
+        {
+          "id": "eligibility",
+          "kind": "eligibility",
+          "description": "Başvuranın henüz şirketleşmemiş bir fikir üzerinde çalışmak istemesi gerekir.",
+          "evidence": "Başvuranın henüz şirketleşmemiş bir fikir üzerinde çalışmak istemesi gerekir.",
+          "required": true,
+          "character_limit": null,
+          "deadline": null
+        },
+        {
+          "id": "document",
+          "kind": "document",
+          "description": "Bir sayfalık fikir tanıtımı PDF olarak yüklenmelidir.",
+          "evidence": "Bir sayfalık fikir tanıtımı PDF olarak yüklenmelidir.",
+          "required": true,
+          "character_limit": null,
+          "deadline": null
+        },
+        {
+          "id": "question_1",
+          "kind": "question",
+          "description": "Fikrin hangi kullanıcı ihtiyacına çözüm getiriyor?",
+          "evidence": "“Fikrin hangi kullanıcı ihtiyacına çözüm getiriyor?” sorusuna en fazla 500 karakterle yanıt verilmelidir.",
+          "required": true,
+          "character_limit": 500,
+          "deadline": null
+        },
+        {
+          "id": "question_2",
+          "kind": "question",
+          "description": "Fikrini doğrulamak için nasıl bir çalışma yaparsın?",
+          "evidence": "“Fikrini doğrulamak için nasıl bir çalışma yaparsın?” sorusuna en fazla 600 karakterle yanıt verilmelidir.",
+          "required": true,
+          "character_limit": 600,
+          "deadline": null
+        },
+        {
+          "id": "question_3",
+          "kind": "question",
+          "description": "Kamptan hangi kazanımlarla ayrılmak istiyorsun?",
+          "evidence": "“Kamptan hangi kazanımlarla ayrılmak istiyorsun?” sorusuna en fazla 450 karakterle yanıt verilmelidir.",
+          "required": true,
+          "character_limit": 450,
+          "deadline": null
+        },
+        {
+          "id": "identity",
+          "kind": "field",
+          "description": "Ad, soyad ve e-posta adresi",
+          "evidence": "Ad, soyad ve e-posta adresi başvuru formunda doldurulmalıdır.",
+          "required": true,
+          "character_limit": null,
+          "deadline": null
+        },
+        {
+          "id": "deadline",
+          "kind": "deadline",
+          "description": "5 Aralık 2026 · 18.00",
+          "evidence": "Son başvuru tarihi 5 Aralık 2026, saat 18.00'dır (Türkiye saati).",
+          "required": true,
+          "character_limit": null,
+          "deadline": "2026-12-05T18:00:00+03:00"
+        },
+        {
+          "id": "submission",
+          "kind": "submission",
+          "description": "Çevrim içi başvuru formundan gönder",
+          "evidence": "Başvuru, örnek programın çevrim içi formu üzerinden gönderilmelidir.",
+          "required": true,
+          "character_limit": null,
+          "deadline": null
+        },
+        {
+          "id": "format",
+          "kind": "format",
+          "description": "Ekler en fazla 8 MB",
+          "evidence": "Eklerin toplam boyutu en fazla 8 MB olmalıdır.",
+          "required": true,
+          "character_limit": null,
+          "deadline": null
+        }
+      ],
+      "ambiguities": []
+    }
+  },
+  {
+    "id": "arastirma",
+    "category": "Araştırma",
+    "filename": "arastirma-2026.txt",
+    "source": "Merak Araştırma Destek Programı 2026 — Örnek Başvuru Yönergesi\nBu yönerge yalnızca FormDedektifi demosu için oluşturulmuştur; gerçek bir ilan değildir.\nMerak Araştırma Destek Programı, öğrencilerin küçük ölçekli araştırma projeleri tasarlamasını destekler.\nBaşvuranın aktif lisans öğrencisi olması ve bir akademik danışman belirlemesi gerekir.\nAraştırma önerisi ve danışman onayı PDF formatında yüklenmelidir.\n“Araştırmak istediğin soru nedir?” sorusuna en fazla 500 karakterle yanıt verilmelidir.\n“Araştırmanda hangi yöntemi izlemeyi planlıyorsun?” sorusuna en fazla 600 karakterle yanıt verilmelidir.\n“Araştırmanın beklenen katkısı nedir?” sorusuna en fazla 450 karakterle yanıt verilmelidir.\nAd, soyad ve e-posta adresi başvuru formunda doldurulmalıdır.\nSon başvuru tarihi 6 Aralık 2026, saat 18.00'dır (Türkiye saati).\nBaşvuru, örnek programın çevrim içi formu üzerinden gönderilmelidir.\nEklerin toplam boyutu en fazla 8 MB olmalıdır.",
+    "question_examples": {
+      "question_1": {
+        "answer": "Bir öğrenme aracının kullanıcıların konuyu anlamasına nasıl katkı sağlayabileceğini araştırmak istiyorum. Soruyu ölçülebilir bir kapsamda ele alarak sonuçları açık biçimde değerlendirmeyi amaçlıyorum.",
+        "suggestions": [
+          "Bu yanıtı kendi hedefinizden bir örnekle nasıl somutlaştırabilirsiniz?",
+          "Eklemek istediğiniz kişisel bir bilgi veya plan var mı?"
+        ]
+      },
+      "question_2": {
+        "answer": "Önce ilgili çalışmaları inceleyip küçük bir uygulama planı oluşturmayı düşünüyorum. Uygun izinler ve danışman yönlendirmesiyle veri toplayarak bulguları sınırlılıklarıyla birlikte değerlendirmek istiyorum.",
+        "suggestions": [
+          "Bu yanıtı kendi hedefinizden bir örnekle nasıl somutlaştırabilirsiniz?",
+          "Eklemek istediğiniz kişisel bir bilgi veya plan var mı?"
+        ]
+      },
+      "question_3": {
+        "answer": "Çalışmanın, ele alınan soruya ilişkin somut bulgular üretmesini ve sonraki araştırmalara yol göstermesini bekliyorum. Sonuçları anlaşılır bir raporla paylaşarak yöntem ve sınırlılıkları görünür tutmak istiyorum.",
+        "suggestions": [
+          "Bu yanıtı kendi hedefinizden bir örnekle nasıl somutlaştırabilirsiniz?",
+          "Eklemek istediğiniz kişisel bir bilgi veya plan var mı?"
+        ]
+      }
+    },
+    "analysis": {
+      "name": "Merak Araştırma Destek Programı 2026",
+      "name_evidence": "Merak Araştırma Destek Programı 2026 — Örnek Başvuru Yönergesi",
+      "purpose": "Öğrencilerin küçük ölçekli araştırma projeleri tasarlamasını destekler.",
+      "purpose_evidence": "Merak Araştırma Destek Programı, öğrencilerin küçük ölçekli araştırma projeleri tasarlamasını destekler.",
+      "requirements": [
+        {
+          "id": "eligibility",
+          "kind": "eligibility",
+          "description": "Başvuranın aktif lisans öğrencisi olması ve bir akademik danışman belirlemesi gerekir.",
+          "evidence": "Başvuranın aktif lisans öğrencisi olması ve bir akademik danışman belirlemesi gerekir.",
+          "required": true,
+          "character_limit": null,
+          "deadline": null
+        },
+        {
+          "id": "document",
+          "kind": "document",
+          "description": "Araştırma önerisi ve danışman onayı PDF formatında yüklenmelidir.",
+          "evidence": "Araştırma önerisi ve danışman onayı PDF formatında yüklenmelidir.",
+          "required": true,
+          "character_limit": null,
+          "deadline": null
+        },
+        {
+          "id": "question_1",
+          "kind": "question",
+          "description": "Araştırmak istediğin soru nedir?",
+          "evidence": "“Araştırmak istediğin soru nedir?” sorusuna en fazla 500 karakterle yanıt verilmelidir.",
+          "required": true,
+          "character_limit": 500,
+          "deadline": null
+        },
+        {
+          "id": "question_2",
+          "kind": "question",
+          "description": "Araştırmanda hangi yöntemi izlemeyi planlıyorsun?",
+          "evidence": "“Araştırmanda hangi yöntemi izlemeyi planlıyorsun?” sorusuna en fazla 600 karakterle yanıt verilmelidir.",
+          "required": true,
+          "character_limit": 600,
+          "deadline": null
+        },
+        {
+          "id": "question_3",
+          "kind": "question",
+          "description": "Araştırmanın beklenen katkısı nedir?",
+          "evidence": "“Araştırmanın beklenen katkısı nedir?” sorusuna en fazla 450 karakterle yanıt verilmelidir.",
+          "required": true,
+          "character_limit": 450,
+          "deadline": null
+        },
+        {
+          "id": "identity",
+          "kind": "field",
+          "description": "Ad, soyad ve e-posta adresi",
+          "evidence": "Ad, soyad ve e-posta adresi başvuru formunda doldurulmalıdır.",
+          "required": true,
+          "character_limit": null,
+          "deadline": null
+        },
+        {
+          "id": "deadline",
+          "kind": "deadline",
+          "description": "6 Aralık 2026 · 18.00",
+          "evidence": "Son başvuru tarihi 6 Aralık 2026, saat 18.00'dır (Türkiye saati).",
+          "required": true,
+          "character_limit": null,
+          "deadline": "2026-12-06T18:00:00+03:00"
+        },
+        {
+          "id": "submission",
+          "kind": "submission",
+          "description": "Çevrim içi başvuru formundan gönder",
+          "evidence": "Başvuru, örnek programın çevrim içi formu üzerinden gönderilmelidir.",
+          "required": true,
+          "character_limit": null,
+          "deadline": null
+        },
+        {
+          "id": "format",
+          "kind": "format",
+          "description": "Ekler en fazla 8 MB",
+          "evidence": "Eklerin toplam boyutu en fazla 8 MB olmalıdır.",
+          "required": true,
+          "character_limit": null,
+          "deadline": null
+        }
+      ],
+      "ambiguities": []
+    }
+  },
+  {
+    "id": "yesil-kampus",
+    "category": "Sürdürülebilirlik",
+    "filename": "yesil-kampus-2026.txt",
+    "source": "Yeşil Kampüs Fikir Yarışması 2026 — Örnek Başvuru Yönergesi\nBu yönerge yalnızca FormDedektifi demosu için oluşturulmuştur; gerçek bir ilan değildir.\nYeşil Kampüs Fikir Yarışması, kampüs yaşamında kaynak tüketimini azaltan uygulanabilir fikirler geliştirmeyi amaçlar.\nBaşvurular üniversite öğrencilerinden oluşan en fazla üç kişilik takımlarca yapılmalıdır.\nProje özeti ve taslak uygulama planı tek PDF olarak yüklenmelidir.\n“Kampüste hangi çevresel soruna odaklanıyorsunuz?” sorusuna en fazla 500 karakterle yanıt verilmelidir.\n“Fikrinizi nasıl uygulamaya geçireceksiniz?” sorusuna en fazla 600 karakterle yanıt verilmelidir.\n“Projenizin etkisini nasıl değerlendireceksiniz?” sorusuna en fazla 450 karakterle yanıt verilmelidir.\nAd, soyad ve e-posta adresi başvuru formunda doldurulmalıdır.\nSon başvuru tarihi 7 Aralık 2026, saat 18.00'dır (Türkiye saati).\nBaşvuru, örnek programın çevrim içi formu üzerinden gönderilmelidir.\nEklerin toplam boyutu en fazla 8 MB olmalıdır.",
+    "question_examples": {
+      "question_1": {
+        "answer": "Kaynakların gereksiz kullanımını azaltabilecek günlük alışkanlıklara odaklanmak istiyoruz. Önce küçük bir alandaki ihtiyacı gözlemleyip uygulanabilir bir çözüm geliştirmeyi amaçlıyoruz.",
+        "suggestions": [
+          "Bu yanıtı kendi hedefinizden bir örnekle nasıl somutlaştırabilirsiniz?",
+          "Eklemek istediğiniz kişisel bir bilgi veya plan var mı?"
+        ]
+      },
+      "question_2": {
+        "answer": "Küçük bir pilot uygulama başlatıp ilgili birimlerden geri bildirim almayı planlıyoruz. Görevleri ve ihtiyaçları belirleyerek sonuçlara göre uygulamayı adım adım geliştirmek istiyoruz.",
+        "suggestions": [
+          "Bu yanıtı kendi hedefinizden bir örnekle nasıl somutlaştırabilirsiniz?",
+          "Eklemek istediğiniz kişisel bir bilgi veya plan var mı?"
+        ]
+      },
+      "question_3": {
+        "answer": "Uygulama öncesi ve sonrasında karşılaştırılabilir göstergeler belirlemek istiyoruz. Katılımcı geri bildirimlerini de değerlendirerek hangi değişimin işe yaradığını açık biçimde raporlamayı planlıyoruz.",
+        "suggestions": [
+          "Bu yanıtı kendi hedefinizden bir örnekle nasıl somutlaştırabilirsiniz?",
+          "Eklemek istediğiniz kişisel bir bilgi veya plan var mı?"
+        ]
+      }
+    },
+    "analysis": {
+      "name": "Yeşil Kampüs Fikir Yarışması 2026",
+      "name_evidence": "Yeşil Kampüs Fikir Yarışması 2026 — Örnek Başvuru Yönergesi",
+      "purpose": "Kampüs yaşamında kaynak tüketimini azaltan uygulanabilir fikirler geliştirmeyi amaçlar.",
+      "purpose_evidence": "Yeşil Kampüs Fikir Yarışması, kampüs yaşamında kaynak tüketimini azaltan uygulanabilir fikirler geliştirmeyi amaçlar.",
+      "requirements": [
+        {
+          "id": "eligibility",
+          "kind": "eligibility",
+          "description": "Başvurular üniversite öğrencilerinden oluşan en fazla üç kişilik takımlarca yapılmalıdır.",
+          "evidence": "Başvurular üniversite öğrencilerinden oluşan en fazla üç kişilik takımlarca yapılmalıdır.",
+          "required": true,
+          "character_limit": null,
+          "deadline": null
+        },
+        {
+          "id": "document",
+          "kind": "document",
+          "description": "Proje özeti ve taslak uygulama planı tek PDF olarak yüklenmelidir.",
+          "evidence": "Proje özeti ve taslak uygulama planı tek PDF olarak yüklenmelidir.",
+          "required": true,
+          "character_limit": null,
+          "deadline": null
+        },
+        {
+          "id": "question_1",
+          "kind": "question",
+          "description": "Kampüste hangi çevresel soruna odaklanıyorsunuz?",
+          "evidence": "“Kampüste hangi çevresel soruna odaklanıyorsunuz?” sorusuna en fazla 500 karakterle yanıt verilmelidir.",
+          "required": true,
+          "character_limit": 500,
+          "deadline": null
+        },
+        {
+          "id": "question_2",
+          "kind": "question",
+          "description": "Fikrinizi nasıl uygulamaya geçireceksiniz?",
+          "evidence": "“Fikrinizi nasıl uygulamaya geçireceksiniz?” sorusuna en fazla 600 karakterle yanıt verilmelidir.",
+          "required": true,
+          "character_limit": 600,
+          "deadline": null
+        },
+        {
+          "id": "question_3",
+          "kind": "question",
+          "description": "Projenizin etkisini nasıl değerlendireceksiniz?",
+          "evidence": "“Projenizin etkisini nasıl değerlendireceksiniz?” sorusuna en fazla 450 karakterle yanıt verilmelidir.",
+          "required": true,
+          "character_limit": 450,
+          "deadline": null
+        },
+        {
+          "id": "identity",
+          "kind": "field",
+          "description": "Ad, soyad ve e-posta adresi",
+          "evidence": "Ad, soyad ve e-posta adresi başvuru formunda doldurulmalıdır.",
+          "required": true,
+          "character_limit": null,
+          "deadline": null
+        },
+        {
+          "id": "deadline",
+          "kind": "deadline",
+          "description": "7 Aralık 2026 · 18.00",
+          "evidence": "Son başvuru tarihi 7 Aralık 2026, saat 18.00'dır (Türkiye saati).",
+          "required": true,
+          "character_limit": null,
+          "deadline": "2026-12-07T18:00:00+03:00"
+        },
+        {
+          "id": "submission",
+          "kind": "submission",
+          "description": "Çevrim içi başvuru formundan gönder",
+          "evidence": "Başvuru, örnek programın çevrim içi formu üzerinden gönderilmelidir.",
+          "required": true,
+          "character_limit": null,
+          "deadline": null
+        },
+        {
+          "id": "format",
+          "kind": "format",
+          "description": "Ekler en fazla 8 MB",
+          "evidence": "Eklerin toplam boyutu en fazla 8 MB olmalıdır.",
+          "required": true,
+          "character_limit": null,
+          "deadline": null
+        }
+      ],
+      "ambiguities": []
+    }
+  },
+  {
+    "id": "tasarim",
+    "category": "Tasarım",
+    "filename": "tasarim-2026.txt",
+    "source": "Erişilebilir Tasarım Atölyesi 2026 — Örnek Başvuru Yönergesi\nBu yönerge yalnızca FormDedektifi demosu için oluşturulmuştur; gerçek bir ilan değildir.\nErişilebilir Tasarım Atölyesi, farklı kullanıcıların ihtiyaçlarına uygun dijital arayüzler tasarlamayı amaçlar.\nKatılımcıların atölye oturumlarının tamamına çevrim içi katılabilmesi gerekir.\nKısa ilgi alanı metni PDF olarak yüklenmelidir.\n“Erişilebilir tasarımla neden ilgileniyorsun?” sorusuna en fazla 500 karakterle yanıt verilmelidir.\n“Hangi kullanıcı sorununu ele almak istersin?” sorusuna en fazla 600 karakterle yanıt verilmelidir.\n“Atölyede nasıl bir çıktı hazırlamak istiyorsun?” sorusuna en fazla 450 karakterle yanıt verilmelidir.\nAd, soyad ve e-posta adresi başvuru formunda doldurulmalıdır.\nSon başvuru tarihi 8 Aralık 2026, saat 18.00'dır (Türkiye saati).\nBaşvuru, örnek programın çevrim içi formu üzerinden gönderilmelidir.\nEklerin toplam boyutu en fazla 8 MB olmalıdır.",
+    "question_examples": {
+      "question_1": {
+        "answer": "Dijital araçların farklı ihtiyaçlara sahip kişiler tarafından rahatça kullanılabilmesini önemsiyorum. Tasarım kararlarını kullanıcı deneyimiyle ilişkilendirerek daha kapsayıcı çözümler üretmek istiyorum.",
+        "suggestions": [
+          "Bu yanıtı kendi hedefinizden bir örnekle nasıl somutlaştırabilirsiniz?",
+          "Eklemek istediğiniz kişisel bir bilgi veya plan var mı?"
+        ]
+      },
+      "question_2": {
+        "answer": "Karmaşık formlarda kullanıcıların hangi adımı tamamlaması gerektiğini anlamakta zorlanmasına odaklanmak isterim. Açık dil, düzenli yapı ve anlaşılır geri bildirimlerle bu süreci kolaylaştırmayı hedefliyorum.",
+        "suggestions": [
+          "Bu yanıtı kendi hedefinizden bir örnekle nasıl somutlaştırabilirsiniz?",
+          "Eklemek istediğiniz kişisel bir bilgi veya plan var mı?"
+        ]
+      },
+      "question_3": {
+        "answer": "Temel bir başvuru akışının etkileşimli prototipini hazırlamak istiyorum. Tasarımı klavye kullanımı, okunabilirlik ve anlaşılır yönlendirmeler açısından değerlendirerek geliştirmeyi amaçlıyorum.",
+        "suggestions": [
+          "Bu yanıtı kendi hedefinizden bir örnekle nasıl somutlaştırabilirsiniz?",
+          "Eklemek istediğiniz kişisel bir bilgi veya plan var mı?"
+        ]
+      }
+    },
+    "analysis": {
+      "name": "Erişilebilir Tasarım Atölyesi 2026",
+      "name_evidence": "Erişilebilir Tasarım Atölyesi 2026 — Örnek Başvuru Yönergesi",
+      "purpose": "Farklı kullanıcıların ihtiyaçlarına uygun dijital arayüzler tasarlamayı amaçlar.",
+      "purpose_evidence": "Erişilebilir Tasarım Atölyesi, farklı kullanıcıların ihtiyaçlarına uygun dijital arayüzler tasarlamayı amaçlar.",
+      "requirements": [
+        {
+          "id": "eligibility",
+          "kind": "eligibility",
+          "description": "Katılımcıların atölye oturumlarının tamamına çevrim içi katılabilmesi gerekir.",
+          "evidence": "Katılımcıların atölye oturumlarının tamamına çevrim içi katılabilmesi gerekir.",
+          "required": true,
+          "character_limit": null,
+          "deadline": null
+        },
+        {
+          "id": "document",
+          "kind": "document",
+          "description": "Kısa ilgi alanı metni PDF olarak yüklenmelidir.",
+          "evidence": "Kısa ilgi alanı metni PDF olarak yüklenmelidir.",
+          "required": true,
+          "character_limit": null,
+          "deadline": null
+        },
+        {
+          "id": "question_1",
+          "kind": "question",
+          "description": "Erişilebilir tasarımla neden ilgileniyorsun?",
+          "evidence": "“Erişilebilir tasarımla neden ilgileniyorsun?” sorusuna en fazla 500 karakterle yanıt verilmelidir.",
+          "required": true,
+          "character_limit": 500,
+          "deadline": null
+        },
+        {
+          "id": "question_2",
+          "kind": "question",
+          "description": "Hangi kullanıcı sorununu ele almak istersin?",
+          "evidence": "“Hangi kullanıcı sorununu ele almak istersin?” sorusuna en fazla 600 karakterle yanıt verilmelidir.",
+          "required": true,
+          "character_limit": 600,
+          "deadline": null
+        },
+        {
+          "id": "question_3",
+          "kind": "question",
+          "description": "Atölyede nasıl bir çıktı hazırlamak istiyorsun?",
+          "evidence": "“Atölyede nasıl bir çıktı hazırlamak istiyorsun?” sorusuna en fazla 450 karakterle yanıt verilmelidir.",
+          "required": true,
+          "character_limit": 450,
+          "deadline": null
+        },
+        {
+          "id": "identity",
+          "kind": "field",
+          "description": "Ad, soyad ve e-posta adresi",
+          "evidence": "Ad, soyad ve e-posta adresi başvuru formunda doldurulmalıdır.",
+          "required": true,
+          "character_limit": null,
+          "deadline": null
+        },
+        {
+          "id": "deadline",
+          "kind": "deadline",
+          "description": "8 Aralık 2026 · 18.00",
+          "evidence": "Son başvuru tarihi 8 Aralık 2026, saat 18.00'dır (Türkiye saati).",
+          "required": true,
+          "character_limit": null,
+          "deadline": "2026-12-08T18:00:00+03:00"
+        },
+        {
+          "id": "submission",
+          "kind": "submission",
+          "description": "Çevrim içi başvuru formundan gönder",
+          "evidence": "Başvuru, örnek programın çevrim içi formu üzerinden gönderilmelidir.",
+          "required": true,
+          "character_limit": null,
+          "deadline": null
+        },
+        {
+          "id": "format",
+          "kind": "format",
+          "description": "Ekler en fazla 8 MB",
+          "evidence": "Eklerin toplam boyutu en fazla 8 MB olmalıdır.",
+          "required": true,
+          "character_limit": null,
+          "deadline": null
+        }
+      ],
+      "ambiguities": []
+    }
+  },
+  {
+    "id": "acik-kaynak",
+    "category": "Açık kaynak",
+    "filename": "acik-kaynak-2026.txt",
+    "source": "Birlikte Kod Açık Kaynak Programı 2026 — Örnek Başvuru Yönergesi\nBu yönerge yalnızca FormDedektifi demosu için oluşturulmuştur; gerçek bir ilan değildir.\nBirlikte Kod Açık Kaynak Programı, katılımcıların açık kaynak projelere düzenli ve anlamlı katkılar sunmasını amaçlar.\nKatılımcıların haftada en az üç saat ayırabilmesi ve topluluk kurallarını kabul etmesi gerekir.\nKatkı ilgi alanlarını anlatan kısa bir PDF yüklenmelidir.\n“Açık kaynak projelere neden katkı sunmak istiyorsun?” sorusuna en fazla 500 karakterle yanıt verilmelidir.\n“Hangi katkı türleriyle başlamak istersin?” sorusuna en fazla 600 karakterle yanıt verilmelidir.\n“Kod incelemesinde geri bildirime nasıl yaklaşırsın?” sorusuna en fazla 450 karakterle yanıt verilmelidir.\nAd, soyad ve e-posta adresi başvuru formunda doldurulmalıdır.\nSon başvuru tarihi 9 Aralık 2026, saat 18.00'dır (Türkiye saati).\nBaşvuru, örnek programın çevrim içi formu üzerinden gönderilmelidir.\nEklerin toplam boyutu en fazla 8 MB olmalıdır.",
+    "question_examples": {
+      "question_1": {
+        "answer": "Birlikte üretilen yazılımların gelişimine katkı sunarken öğrenmek istiyorum. Küçük ve anlaşılır görevlerle başlayıp topluluğun geri bildirimlerine göre katkılarımı geliştirmeyi amaçlıyorum.",
+        "suggestions": [
+          "Bu yanıtı kendi hedefinizden bir örnekle nasıl somutlaştırabilirsiniz?",
+          "Eklemek istediğiniz kişisel bir bilgi veya plan var mı?"
+        ]
+      },
+      "question_2": {
+        "answer": "Dokümantasyonun iyileştirilmesi, hata bildirimlerinin incelenmesi ve küçük testlerin hazırlanmasıyla başlamak isterim. Projenin ihtiyaçlarını anlayarak sürdürülebilir katkılar sunmayı hedefliyorum.",
+        "suggestions": [
+          "Bu yanıtı kendi hedefinizden bir örnekle nasıl somutlaştırabilirsiniz?",
+          "Eklemek istediğiniz kişisel bir bilgi veya plan var mı?"
+        ]
+      },
+      "question_3": {
+        "answer": "Geri bildirimi çözümü ve ortak çalışma biçimini geliştiren bir fırsat olarak görürüm. Anlamadığım noktaları sorup değişikliklerin nedenini öğrenerek önerileri dikkatle değerlendirmek isterim.",
+        "suggestions": [
+          "Bu yanıtı kendi hedefinizden bir örnekle nasıl somutlaştırabilirsiniz?",
+          "Eklemek istediğiniz kişisel bir bilgi veya plan var mı?"
+        ]
+      }
+    },
+    "analysis": {
+      "name": "Birlikte Kod Açık Kaynak Programı 2026",
+      "name_evidence": "Birlikte Kod Açık Kaynak Programı 2026 — Örnek Başvuru Yönergesi",
+      "purpose": "Katılımcıların açık kaynak projelere düzenli ve anlamlı katkılar sunmasını amaçlar.",
+      "purpose_evidence": "Birlikte Kod Açık Kaynak Programı, katılımcıların açık kaynak projelere düzenli ve anlamlı katkılar sunmasını amaçlar.",
+      "requirements": [
+        {
+          "id": "eligibility",
+          "kind": "eligibility",
+          "description": "Katılımcıların haftada en az üç saat ayırabilmesi ve topluluk kurallarını kabul etmesi gerekir.",
+          "evidence": "Katılımcıların haftada en az üç saat ayırabilmesi ve topluluk kurallarını kabul etmesi gerekir.",
+          "required": true,
+          "character_limit": null,
+          "deadline": null
+        },
+        {
+          "id": "document",
+          "kind": "document",
+          "description": "Katkı ilgi alanlarını anlatan kısa bir PDF yüklenmelidir.",
+          "evidence": "Katkı ilgi alanlarını anlatan kısa bir PDF yüklenmelidir.",
+          "required": true,
+          "character_limit": null,
+          "deadline": null
+        },
+        {
+          "id": "question_1",
+          "kind": "question",
+          "description": "Açık kaynak projelere neden katkı sunmak istiyorsun?",
+          "evidence": "“Açık kaynak projelere neden katkı sunmak istiyorsun?” sorusuna en fazla 500 karakterle yanıt verilmelidir.",
+          "required": true,
+          "character_limit": 500,
+          "deadline": null
+        },
+        {
+          "id": "question_2",
+          "kind": "question",
+          "description": "Hangi katkı türleriyle başlamak istersin?",
+          "evidence": "“Hangi katkı türleriyle başlamak istersin?” sorusuna en fazla 600 karakterle yanıt verilmelidir.",
+          "required": true,
+          "character_limit": 600,
+          "deadline": null
+        },
+        {
+          "id": "question_3",
+          "kind": "question",
+          "description": "Kod incelemesinde geri bildirime nasıl yaklaşırsın?",
+          "evidence": "“Kod incelemesinde geri bildirime nasıl yaklaşırsın?” sorusuna en fazla 450 karakterle yanıt verilmelidir.",
+          "required": true,
+          "character_limit": 450,
+          "deadline": null
+        },
+        {
+          "id": "identity",
+          "kind": "field",
+          "description": "Ad, soyad ve e-posta adresi",
+          "evidence": "Ad, soyad ve e-posta adresi başvuru formunda doldurulmalıdır.",
+          "required": true,
+          "character_limit": null,
+          "deadline": null
+        },
+        {
+          "id": "deadline",
+          "kind": "deadline",
+          "description": "9 Aralık 2026 · 18.00",
+          "evidence": "Son başvuru tarihi 9 Aralık 2026, saat 18.00'dır (Türkiye saati).",
+          "required": true,
+          "character_limit": null,
+          "deadline": "2026-12-09T18:00:00+03:00"
+        },
+        {
+          "id": "submission",
+          "kind": "submission",
+          "description": "Çevrim içi başvuru formundan gönder",
+          "evidence": "Başvuru, örnek programın çevrim içi formu üzerinden gönderilmelidir.",
+          "required": true,
+          "character_limit": null,
+          "deadline": null
+        },
+        {
+          "id": "format",
+          "kind": "format",
+          "description": "Ekler en fazla 8 MB",
+          "evidence": "Eklerin toplam boyutu en fazla 8 MB olmalıdır.",
+          "required": true,
+          "character_limit": null,
+          "deadline": null
+        }
+      ],
+      "ambiguities": []
+    }
+  },
+  {
+    "id": "degisim",
+    "category": "Değişim",
+    "filename": "degisim-2026.txt",
+    "source": "Ufuk Kültürel Değişim Programı 2026 — Örnek Başvuru Yönergesi\nBu yönerge yalnızca FormDedektifi demosu için oluşturulmuştur; gerçek bir ilan değildir.\nUfuk Kültürel Değişim Programı, katılımcıların farklı kültürlerle birlikte öğrenme ve ortak çalışma deneyimi kazanmasını amaçlar.\nBaşvuranın aktif üniversite öğrencisi olması ve program tarihlerine uygunluk beyanı vermesi gerekir.\nÖğrenci belgesi ve kısa niyet mektubu PDF olarak yüklenmelidir.\n“Bu değişim programından ne öğrenmek istiyorsun?” sorusuna en fazla 500 karakterle yanıt verilmelidir.\n“Farklı kültürlerden kişilerle ortak çalışmaya nasıl yaklaşırsın?” sorusuna en fazla 600 karakterle yanıt verilmelidir.\n“Program sonrasında kazanımlarını nasıl paylaşmak istersin?” sorusuna en fazla 450 karakterle yanıt verilmelidir.\nAd, soyad ve e-posta adresi başvuru formunda doldurulmalıdır.\nSon başvuru tarihi 10 Aralık 2026, saat 18.00'dır (Türkiye saati).\nBaşvuru, örnek programın çevrim içi formu üzerinden gönderilmelidir.\nEklerin toplam boyutu en fazla 8 MB olmalıdır.",
+    "question_examples": {
+      "question_1": {
+        "answer": "Farklı bakış açılarını tanımak ve birlikte çalışma becerilerimi geliştirmek istiyorum. Deneyimi karşılıklı öğrenme fırsatı olarak değerlendirerek öğrendiklerimi günlük çalışmalarımda kullanmayı amaçlıyorum.",
+        "suggestions": [
+          "Bu yanıtı kendi hedefinizden bir örnekle nasıl somutlaştırabilirsiniz?",
+          "Eklemek istediğiniz kişisel bir bilgi veya plan var mı?"
+        ]
+      },
+      "question_2": {
+        "answer": "Önce dinlemeye ve ortak beklentileri anlamaya önem veririm. Saygılı iletişim kurarak farklı çalışma biçimlerine açık olmayı ve ortak hedefler etrafında ilerlemeyi amaçlıyorum.",
+        "suggestions": [
+          "Bu yanıtı kendi hedefinizden bir örnekle nasıl somutlaştırabilirsiniz?",
+          "Eklemek istediğiniz kişisel bir bilgi veya plan var mı?"
+        ]
+      },
+      "question_3": {
+        "answer": "Öğrendiklerimi kısa notlar ve bir paylaşım oturumuyla aktarmak isterim. Özellikle birlikte çalışma konusunda yararlı bulduğum yaklaşımları anlaşılır örneklerle paylaşmayı planlıyorum.",
+        "suggestions": [
+          "Bu yanıtı kendi hedefinizden bir örnekle nasıl somutlaştırabilirsiniz?",
+          "Eklemek istediğiniz kişisel bir bilgi veya plan var mı?"
+        ]
+      }
+    },
+    "analysis": {
+      "name": "Ufuk Kültürel Değişim Programı 2026",
+      "name_evidence": "Ufuk Kültürel Değişim Programı 2026 — Örnek Başvuru Yönergesi",
+      "purpose": "Katılımcıların farklı kültürlerle birlikte öğrenme ve ortak çalışma deneyimi kazanmasını amaçlar.",
+      "purpose_evidence": "Ufuk Kültürel Değişim Programı, katılımcıların farklı kültürlerle birlikte öğrenme ve ortak çalışma deneyimi kazanmasını amaçlar.",
+      "requirements": [
+        {
+          "id": "eligibility",
+          "kind": "eligibility",
+          "description": "Başvuranın aktif üniversite öğrencisi olması ve program tarihlerine uygunluk beyanı vermesi gerekir.",
+          "evidence": "Başvuranın aktif üniversite öğrencisi olması ve program tarihlerine uygunluk beyanı vermesi gerekir.",
+          "required": true,
+          "character_limit": null,
+          "deadline": null
+        },
+        {
+          "id": "document",
+          "kind": "document",
+          "description": "Öğrenci belgesi ve kısa niyet mektubu PDF olarak yüklenmelidir.",
+          "evidence": "Öğrenci belgesi ve kısa niyet mektubu PDF olarak yüklenmelidir.",
+          "required": true,
+          "character_limit": null,
+          "deadline": null
+        },
+        {
+          "id": "question_1",
+          "kind": "question",
+          "description": "Bu değişim programından ne öğrenmek istiyorsun?",
+          "evidence": "“Bu değişim programından ne öğrenmek istiyorsun?” sorusuna en fazla 500 karakterle yanıt verilmelidir.",
+          "required": true,
+          "character_limit": 500,
+          "deadline": null
+        },
+        {
+          "id": "question_2",
+          "kind": "question",
+          "description": "Farklı kültürlerden kişilerle ortak çalışmaya nasıl yaklaşırsın?",
+          "evidence": "“Farklı kültürlerden kişilerle ortak çalışmaya nasıl yaklaşırsın?” sorusuna en fazla 600 karakterle yanıt verilmelidir.",
+          "required": true,
+          "character_limit": 600,
+          "deadline": null
+        },
+        {
+          "id": "question_3",
+          "kind": "question",
+          "description": "Program sonrasında kazanımlarını nasıl paylaşmak istersin?",
+          "evidence": "“Program sonrasında kazanımlarını nasıl paylaşmak istersin?” sorusuna en fazla 450 karakterle yanıt verilmelidir.",
+          "required": true,
+          "character_limit": 450,
+          "deadline": null
+        },
+        {
+          "id": "identity",
+          "kind": "field",
+          "description": "Ad, soyad ve e-posta adresi",
+          "evidence": "Ad, soyad ve e-posta adresi başvuru formunda doldurulmalıdır.",
+          "required": true,
+          "character_limit": null,
+          "deadline": null
+        },
+        {
+          "id": "deadline",
+          "kind": "deadline",
+          "description": "10 Aralık 2026 · 18.00",
+          "evidence": "Son başvuru tarihi 10 Aralık 2026, saat 18.00'dır (Türkiye saati).",
+          "required": true,
+          "character_limit": null,
+          "deadline": "2026-12-10T18:00:00+03:00"
+        },
+        {
+          "id": "submission",
+          "kind": "submission",
+          "description": "Çevrim içi başvuru formundan gönder",
+          "evidence": "Başvuru, örnek programın çevrim içi formu üzerinden gönderilmelidir.",
+          "required": true,
+          "character_limit": null,
+          "deadline": null
+        },
+        {
+          "id": "format",
+          "kind": "format",
+          "description": "Ekler en fazla 8 MB",
+          "evidence": "Eklerin toplam boyutu en fazla 8 MB olmalıdır.",
+          "required": true,
+          "character_limit": null,
+          "deadline": null
+        }
+      ],
+      "ambiguities": []
+    }
+  },
+  {
+    "id": "mentorluk",
+    "category": "Mentorluk",
+    "filename": "mentorluk-2026.txt",
+    "source": "Kariyer Pusulası Mentorluk Programı 2026 — Örnek Başvuru Yönergesi\nBu yönerge yalnızca FormDedektifi demosu için oluşturulmuştur; gerçek bir ilan değildir.\nKariyer Pusulası Mentorluk Programı, öğrencilerin eğitim ve kariyer hedeflerini somut adımlara dönüştürmesini destekler.\nKatılımcıların ayda iki görüşmeye zaman ayırabilmesi gerekir.\nGüncel özgeçmiş veya kısa tanıtım metni PDF olarak yüklenmelidir.\n“Mentorluk sürecinde hangi konularda destek almak istiyorsun?” sorusuna en fazla 500 karakterle yanıt verilmelidir.\n“Önümüzdeki altı ay için bir gelişim hedefin nedir?” sorusuna en fazla 600 karakterle yanıt verilmelidir.\n“Mentor görüşmelerine nasıl hazırlanmayı planlıyorsun?” sorusuna en fazla 450 karakterle yanıt verilmelidir.\nAd, soyad ve e-posta adresi başvuru formunda doldurulmalıdır.\nSon başvuru tarihi 11 Aralık 2026, saat 18.00'dır (Türkiye saati).\nBaşvuru, örnek programın çevrim içi formu üzerinden gönderilmelidir.\nEklerin toplam boyutu en fazla 8 MB olmalıdır.",
+    "question_examples": {
+      "question_1": {
+        "answer": "Hedeflerimi netleştirmek ve gelişim için uygulanabilir bir plan hazırlamak konusunda destek almak istiyorum. Seçenekleri değerlendirirken geri bildirim alarak daha bilinçli kararlar vermeyi amaçlıyorum.",
+        "suggestions": [
+          "Bu yanıtı kendi hedefinizden bir örnekle nasıl somutlaştırabilirsiniz?",
+          "Eklemek istediğiniz kişisel bir bilgi veya plan var mı?"
+        ]
+      },
+      "question_2": {
+        "answer": "Bir öğrenme hedefini düzenli çalışma adımlarına bölüp küçük bir uygulamayla tamamlamak istiyorum. İlerlememi belirli aralıklarla değerlendirerek planımı ihtiyaçlarıma göre güncellemeyi amaçlıyorum.",
+        "suggestions": [
+          "Bu yanıtı kendi hedefinizden bir örnekle nasıl somutlaştırabilirsiniz?",
+          "Eklemek istediğiniz kişisel bir bilgi veya plan var mı?"
+        ]
+      },
+      "question_3": {
+        "answer": "Her görüşme öncesinde yaptığım çalışmaları, karşılaştığım sorunları ve sorularımı kısa notlarla hazırlamak istiyorum. Görüşme sonunda belirlenen adımları takip ederek süreci verimli kullanmayı hedefliyorum.",
+        "suggestions": [
+          "Bu yanıtı kendi hedefinizden bir örnekle nasıl somutlaştırabilirsiniz?",
+          "Eklemek istediğiniz kişisel bir bilgi veya plan var mı?"
+        ]
+      }
+    },
+    "analysis": {
+      "name": "Kariyer Pusulası Mentorluk Programı 2026",
+      "name_evidence": "Kariyer Pusulası Mentorluk Programı 2026 — Örnek Başvuru Yönergesi",
+      "purpose": "Öğrencilerin eğitim ve kariyer hedeflerini somut adımlara dönüştürmesini destekler.",
+      "purpose_evidence": "Kariyer Pusulası Mentorluk Programı, öğrencilerin eğitim ve kariyer hedeflerini somut adımlara dönüştürmesini destekler.",
+      "requirements": [
+        {
+          "id": "eligibility",
+          "kind": "eligibility",
+          "description": "Katılımcıların ayda iki görüşmeye zaman ayırabilmesi gerekir.",
+          "evidence": "Katılımcıların ayda iki görüşmeye zaman ayırabilmesi gerekir.",
+          "required": true,
+          "character_limit": null,
+          "deadline": null
+        },
+        {
+          "id": "document",
+          "kind": "document",
+          "description": "Güncel özgeçmiş veya kısa tanıtım metni PDF olarak yüklenmelidir.",
+          "evidence": "Güncel özgeçmiş veya kısa tanıtım metni PDF olarak yüklenmelidir.",
+          "required": true,
+          "character_limit": null,
+          "deadline": null
+        },
+        {
+          "id": "question_1",
+          "kind": "question",
+          "description": "Mentorluk sürecinde hangi konularda destek almak istiyorsun?",
+          "evidence": "“Mentorluk sürecinde hangi konularda destek almak istiyorsun?” sorusuna en fazla 500 karakterle yanıt verilmelidir.",
+          "required": true,
+          "character_limit": 500,
+          "deadline": null
+        },
+        {
+          "id": "question_2",
+          "kind": "question",
+          "description": "Önümüzdeki altı ay için bir gelişim hedefin nedir?",
+          "evidence": "“Önümüzdeki altı ay için bir gelişim hedefin nedir?” sorusuna en fazla 600 karakterle yanıt verilmelidir.",
+          "required": true,
+          "character_limit": 600,
+          "deadline": null
+        },
+        {
+          "id": "question_3",
+          "kind": "question",
+          "description": "Mentor görüşmelerine nasıl hazırlanmayı planlıyorsun?",
+          "evidence": "“Mentor görüşmelerine nasıl hazırlanmayı planlıyorsun?” sorusuna en fazla 450 karakterle yanıt verilmelidir.",
+          "required": true,
+          "character_limit": 450,
+          "deadline": null
+        },
+        {
+          "id": "identity",
+          "kind": "field",
+          "description": "Ad, soyad ve e-posta adresi",
+          "evidence": "Ad, soyad ve e-posta adresi başvuru formunda doldurulmalıdır.",
+          "required": true,
+          "character_limit": null,
+          "deadline": null
+        },
+        {
+          "id": "deadline",
+          "kind": "deadline",
+          "description": "11 Aralık 2026 · 18.00",
+          "evidence": "Son başvuru tarihi 11 Aralık 2026, saat 18.00'dır (Türkiye saati).",
+          "required": true,
+          "character_limit": null,
+          "deadline": "2026-12-11T18:00:00+03:00"
+        },
+        {
+          "id": "submission",
+          "kind": "submission",
+          "description": "Çevrim içi başvuru formundan gönder",
+          "evidence": "Başvuru, örnek programın çevrim içi formu üzerinden gönderilmelidir.",
+          "required": true,
+          "character_limit": null,
+          "deadline": null
+        },
+        {
+          "id": "format",
+          "kind": "format",
+          "description": "Ekler en fazla 8 MB",
+          "evidence": "Eklerin toplam boyutu en fazla 8 MB olmalıdır.",
+          "required": true,
+          "character_limit": null,
+          "deadline": null
+        }
+      ],
+      "ambiguities": []
+    }
+  },
+  {
+    "id": "sosyal-proje",
+    "category": "Sosyal etki",
+    "filename": "sosyal-proje-2026.txt",
+    "source": "Mahalle İçin Bir Fikir Proje Çağrısı 2026 — Örnek Başvuru Yönergesi\nBu yönerge yalnızca FormDedektifi demosu için oluşturulmuştur; gerçek bir ilan değildir.\nMahalle İçin Bir Fikir Proje Çağrısı, yerel ihtiyaçlara yönelik küçük ve sürdürülebilir sosyal projeleri destekler.\nBaşvurular en az iki kişilik ekiplerce yapılmalı ve bir ekip iletişim sorumlusu belirlenmelidir.\nİhtiyaç özeti ve taslak faaliyet planı PDF olarak eklenmelidir.\n“Projeniz hangi yerel ihtiyaca odaklanıyor?” sorusuna en fazla 500 karakterle yanıt verilmelidir.\n“Hedef kitlenizi proje sürecine nasıl dahil edeceksiniz?” sorusuna en fazla 600 karakterle yanıt verilmelidir.\n“Projenin devamlılığını nasıl sağlamayı düşünüyorsunuz?” sorusuna en fazla 450 karakterle yanıt verilmelidir.\nAd, soyad ve e-posta adresi başvuru formunda doldurulmalıdır.\nSon başvuru tarihi 12 Aralık 2026, saat 18.00'dır (Türkiye saati).\nBaşvuru, örnek programın çevrim içi formu üzerinden gönderilmelidir.\nEklerin toplam boyutu en fazla 8 MB olmalıdır.",
+    "question_examples": {
+      "question_1": {
+        "answer": "Bilgiye erişim ve birlikte öğrenme ihtiyacına odaklanan küçük bir çalışma planlamak istiyoruz. Yerel katılımcıları dinleyerek öncelikleri birlikte belirlemeyi amaçlıyoruz.",
+        "suggestions": [
+          "Bu yanıtı kendi hedefinizden bir örnekle nasıl somutlaştırabilirsiniz?",
+          "Eklemek istediğiniz kişisel bir bilgi veya plan var mı?"
+        ]
+      },
+      "question_2": {
+        "answer": "Katılımcıların görüşlerini hazırlık aşamasında alıp faaliyetleri bu ihtiyaçlara göre şekillendirmek istiyoruz. Süreç boyunca açık iletişim kurarak geri bildirimlere göre düzenleme yapmayı planlıyoruz.",
+        "suggestions": [
+          "Bu yanıtı kendi hedefinizden bir örnekle nasıl somutlaştırabilirsiniz?",
+          "Eklemek istediğiniz kişisel bir bilgi veya plan var mı?"
+        ]
+      },
+      "question_3": {
+        "answer": "Görevleri paylaşılabilir hale getirip çalışma notlarını düzenli tutmayı planlıyoruz. Küçük bir kapsamla başlayarak gönüllü katılımı ve düzenli değerlendirme yoluyla süreklilik sağlamayı amaçlıyoruz.",
+        "suggestions": [
+          "Bu yanıtı kendi hedefinizden bir örnekle nasıl somutlaştırabilirsiniz?",
+          "Eklemek istediğiniz kişisel bir bilgi veya plan var mı?"
+        ]
+      }
+    },
+    "analysis": {
+      "name": "Mahalle İçin Bir Fikir Proje Çağrısı 2026",
+      "name_evidence": "Mahalle İçin Bir Fikir Proje Çağrısı 2026 — Örnek Başvuru Yönergesi",
+      "purpose": "Yerel ihtiyaçlara yönelik küçük ve sürdürülebilir sosyal projeleri destekler.",
+      "purpose_evidence": "Mahalle İçin Bir Fikir Proje Çağrısı, yerel ihtiyaçlara yönelik küçük ve sürdürülebilir sosyal projeleri destekler.",
+      "requirements": [
+        {
+          "id": "eligibility",
+          "kind": "eligibility",
+          "description": "Başvurular en az iki kişilik ekiplerce yapılmalı ve bir ekip iletişim sorumlusu belirlenmelidir.",
+          "evidence": "Başvurular en az iki kişilik ekiplerce yapılmalı ve bir ekip iletişim sorumlusu belirlenmelidir.",
+          "required": true,
+          "character_limit": null,
+          "deadline": null
+        },
+        {
+          "id": "document",
+          "kind": "document",
+          "description": "İhtiyaç özeti ve taslak faaliyet planı PDF olarak eklenmelidir.",
+          "evidence": "İhtiyaç özeti ve taslak faaliyet planı PDF olarak eklenmelidir.",
+          "required": true,
+          "character_limit": null,
+          "deadline": null
+        },
+        {
+          "id": "question_1",
+          "kind": "question",
+          "description": "Projeniz hangi yerel ihtiyaca odaklanıyor?",
+          "evidence": "“Projeniz hangi yerel ihtiyaca odaklanıyor?” sorusuna en fazla 500 karakterle yanıt verilmelidir.",
+          "required": true,
+          "character_limit": 500,
+          "deadline": null
+        },
+        {
+          "id": "question_2",
+          "kind": "question",
+          "description": "Hedef kitlenizi proje sürecine nasıl dahil edeceksiniz?",
+          "evidence": "“Hedef kitlenizi proje sürecine nasıl dahil edeceksiniz?” sorusuna en fazla 600 karakterle yanıt verilmelidir.",
+          "required": true,
+          "character_limit": 600,
+          "deadline": null
+        },
+        {
+          "id": "question_3",
+          "kind": "question",
+          "description": "Projenin devamlılığını nasıl sağlamayı düşünüyorsunuz?",
+          "evidence": "“Projenin devamlılığını nasıl sağlamayı düşünüyorsunuz?” sorusuna en fazla 450 karakterle yanıt verilmelidir.",
+          "required": true,
+          "character_limit": 450,
+          "deadline": null
+        },
+        {
+          "id": "identity",
+          "kind": "field",
+          "description": "Ad, soyad ve e-posta adresi",
+          "evidence": "Ad, soyad ve e-posta adresi başvuru formunda doldurulmalıdır.",
+          "required": true,
+          "character_limit": null,
+          "deadline": null
+        },
+        {
+          "id": "deadline",
+          "kind": "deadline",
+          "description": "12 Aralık 2026 · 18.00",
+          "evidence": "Son başvuru tarihi 12 Aralık 2026, saat 18.00'dır (Türkiye saati).",
+          "required": true,
+          "character_limit": null,
+          "deadline": "2026-12-12T18:00:00+03:00"
+        },
+        {
+          "id": "submission",
+          "kind": "submission",
+          "description": "Çevrim içi başvuru formundan gönder",
+          "evidence": "Başvuru, örnek programın çevrim içi formu üzerinden gönderilmelidir.",
+          "required": true,
+          "character_limit": null,
+          "deadline": null
+        },
+        {
+          "id": "format",
+          "kind": "format",
+          "description": "Ekler en fazla 8 MB",
+          "evidence": "Eklerin toplam boyutu en fazla 8 MB olmalıdır.",
+          "required": true,
+          "character_limit": null,
+          "deadline": null
+        }
+      ],
+      "ambiguities": []
+    }
+  },
+  {
+    "id": "yaratici-yazarlik",
+    "category": "Sanat ve kültür",
+    "filename": "yaratici-yazarlik-2026.txt",
+    "source": "Yeni Sesler Yaratıcı Yazarlık Atölyesi 2026 — Örnek Başvuru Yönergesi\nBu yönerge yalnızca FormDedektifi demosu için oluşturulmuştur; gerçek bir ilan değildir.\nYeni Sesler Yaratıcı Yazarlık Atölyesi, katılımcıların anlatım becerilerini geliştirmesini ve düzenli yazma alışkanlığı kazanmasını amaçlar.\nKatılımcıların haftalık yazma çalışmalarını tamamlamayı kabul etmesi gerekir.\nEn fazla iki sayfalık örnek metin PDF olarak eklenmelidir.\n“Bu yazarlık atölyesine neden katılmak istiyorsun?” sorusuna en fazla 500 karakterle yanıt verilmelidir.\n“Yazılarında hangi konuları keşfetmek istersin?” sorusuna en fazla 600 karakterle yanıt verilmelidir.\n“Metnine gelen eleştirileri nasıl değerlendirmek istersin?” sorusuna en fazla 450 karakterle yanıt verilmelidir.\nAd, soyad ve e-posta adresi başvuru formunda doldurulmalıdır.\nSon başvuru tarihi 13 Aralık 2026, saat 18.00'dır (Türkiye saati).\nBaşvuru, örnek programın çevrim içi formu üzerinden gönderilmelidir.\nEklerin toplam boyutu en fazla 8 MB olmalıdır.",
+    "question_examples": {
+      "question_1": {
+        "answer": "Düşüncelerimi daha açık ve etkili biçimde ifade etmeyi öğrenmek istiyorum. Düzenli yazma çalışmaları ve geri bildirimlerle anlatımımı geliştirmeyi amaçlıyorum.",
+        "suggestions": [
+          "Bu yanıtı kendi hedefinizden bir örnekle nasıl somutlaştırabilirsiniz?",
+          "Eklemek istediğiniz kişisel bir bilgi veya plan var mı?"
+        ]
+      },
+      "question_2": {
+        "answer": "Gündelik yaşamda fark edilmeyen ayrıntılar ve insanlar arasındaki iletişim üzerine düşünmek istiyorum. Farklı anlatım biçimlerini deneyerek kendi ifade olanaklarımı keşfetmeyi hedefliyorum.",
+        "suggestions": [
+          "Bu yanıtı kendi hedefinizden bir örnekle nasıl somutlaştırabilirsiniz?",
+          "Eklemek istediğiniz kişisel bir bilgi veya plan var mı?"
+        ]
+      },
+      "question_3": {
+        "answer": "Önce okurun metinde nasıl bir deneyim yaşadığını anlamaya çalışırım. Geri bildirimleri metnin amacıyla birlikte değerlendirip farklı düzenleme seçeneklerini denemeye açık olmayı önemserim.",
+        "suggestions": [
+          "Bu yanıtı kendi hedefinizden bir örnekle nasıl somutlaştırabilirsiniz?",
+          "Eklemek istediğiniz kişisel bir bilgi veya plan var mı?"
+        ]
+      }
+    },
+    "analysis": {
+      "name": "Yeni Sesler Yaratıcı Yazarlık Atölyesi 2026",
+      "name_evidence": "Yeni Sesler Yaratıcı Yazarlık Atölyesi 2026 — Örnek Başvuru Yönergesi",
+      "purpose": "Katılımcıların anlatım becerilerini geliştirmesini ve düzenli yazma alışkanlığı kazanmasını amaçlar.",
+      "purpose_evidence": "Yeni Sesler Yaratıcı Yazarlık Atölyesi, katılımcıların anlatım becerilerini geliştirmesini ve düzenli yazma alışkanlığı kazanmasını amaçlar.",
+      "requirements": [
+        {
+          "id": "eligibility",
+          "kind": "eligibility",
+          "description": "Katılımcıların haftalık yazma çalışmalarını tamamlamayı kabul etmesi gerekir.",
+          "evidence": "Katılımcıların haftalık yazma çalışmalarını tamamlamayı kabul etmesi gerekir.",
+          "required": true,
+          "character_limit": null,
+          "deadline": null
+        },
+        {
+          "id": "document",
+          "kind": "document",
+          "description": "En fazla iki sayfalık örnek metin PDF olarak eklenmelidir.",
+          "evidence": "En fazla iki sayfalık örnek metin PDF olarak eklenmelidir.",
+          "required": true,
+          "character_limit": null,
+          "deadline": null
+        },
+        {
+          "id": "question_1",
+          "kind": "question",
+          "description": "Bu yazarlık atölyesine neden katılmak istiyorsun?",
+          "evidence": "“Bu yazarlık atölyesine neden katılmak istiyorsun?” sorusuna en fazla 500 karakterle yanıt verilmelidir.",
+          "required": true,
+          "character_limit": 500,
+          "deadline": null
+        },
+        {
+          "id": "question_2",
+          "kind": "question",
+          "description": "Yazılarında hangi konuları keşfetmek istersin?",
+          "evidence": "“Yazılarında hangi konuları keşfetmek istersin?” sorusuna en fazla 600 karakterle yanıt verilmelidir.",
+          "required": true,
+          "character_limit": 600,
+          "deadline": null
+        },
+        {
+          "id": "question_3",
+          "kind": "question",
+          "description": "Metnine gelen eleştirileri nasıl değerlendirmek istersin?",
+          "evidence": "“Metnine gelen eleştirileri nasıl değerlendirmek istersin?” sorusuna en fazla 450 karakterle yanıt verilmelidir.",
+          "required": true,
+          "character_limit": 450,
+          "deadline": null
+        },
+        {
+          "id": "identity",
+          "kind": "field",
+          "description": "Ad, soyad ve e-posta adresi",
+          "evidence": "Ad, soyad ve e-posta adresi başvuru formunda doldurulmalıdır.",
+          "required": true,
+          "character_limit": null,
+          "deadline": null
+        },
+        {
+          "id": "deadline",
+          "kind": "deadline",
+          "description": "13 Aralık 2026 · 18.00",
+          "evidence": "Son başvuru tarihi 13 Aralık 2026, saat 18.00'dır (Türkiye saati).",
+          "required": true,
+          "character_limit": null,
+          "deadline": "2026-12-13T18:00:00+03:00"
+        },
+        {
+          "id": "submission",
+          "kind": "submission",
+          "description": "Çevrim içi başvuru formundan gönder",
+          "evidence": "Başvuru, örnek programın çevrim içi formu üzerinden gönderilmelidir.",
+          "required": true,
+          "character_limit": null,
+          "deadline": null
+        },
+        {
+          "id": "format",
+          "kind": "format",
+          "description": "Ekler en fazla 8 MB",
+          "evidence": "Eklerin toplam boyutu en fazla 8 MB olmalıdır.",
+          "required": true,
+          "character_limit": null,
+          "deadline": null
+        }
+      ],
+      "ambiguities": []
+    }
+  }
+]

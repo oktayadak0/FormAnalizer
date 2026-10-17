@@ -24,6 +24,15 @@ export type Analysis = {
   ambiguities: { description: string; evidence: string }[];
 };
 export type TaskStatus = "not_started" | "in_progress" | "completed";
+export type QuestionExample = { answer: string; suggestions: string[] };
+export type SampleApplication = {
+  id: string;
+  category: string;
+  filename: string;
+  source: string;
+  analysis: Analysis;
+  question_examples: Record<string, QuestionExample>;
+};
 export type InfoStatus =
   | "provided"
   | "missing"
@@ -44,7 +53,9 @@ export type Draft = {
   answer: string;
   follow_up_questions: string[];
   mode: "demo" | "live";
+  generic?: boolean;
 };
+export type FollowUpAnswer = { question: string; answer: string };
 export type Project = {
   id: string;
   source: string;
@@ -55,10 +66,21 @@ export type Project = {
   facts: Record<string, Fact>;
   personal: Record<string, string>;
   answers: Record<string, string>;
+  answerModes?: Record<string, "live" | "demo" | "manual">;
+  answerKinds?: Record<string, "generic" | "personal">;
+  answerSuggestions?: Record<string, string[]>;
+  followUpAnswers?: Record<string, Record<string, string>>;
   missing: MissingItem[] | null;
 };
 export type AIStatus = {
   state: "checking" | "connected" | "demo" | "unavailable";
   label: string;
   detail: string;
+  model?: string;
+  code?: string;
+  provider?: string;
+  api_key_required?: boolean;
+  ollama_reachable?: boolean;
+  model_installed?: boolean | null;
+  inference_verified?: boolean;
 };

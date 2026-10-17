@@ -1,6 +1,12 @@
 import { expect, test } from "@playwright/test";
 import AxeBuilder from "@axe-core/playwright";
 
+test.beforeEach(async ({ page }) => {
+  await page.addInitScript(() => {
+    Math.random = () => 0;
+  });
+});
+
 test("complete sample workflow, editing, source evidence, checklist and clearing", async ({
   page,
 }) => {
@@ -36,7 +42,7 @@ test("complete sample workflow, editing, source evidence, checklist and clearing
     page.getByRole("heading", { name: "Umut Bursu 2026" }),
   ).toBeVisible();
   await expect(
-    page.getByText("Canlı AI kullanılmıyor.", { exact: false }),
+    page.getByText("analiz için canlı AI kullanılmadı.", { exact: false }),
   ).toBeVisible();
   await page
     .getByRole("tabpanel")
@@ -52,7 +58,7 @@ test("complete sample workflow, editing, source evidence, checklist and clearing
   await select.selectOption("in_progress");
   await expect(page.getByText("%0", { exact: true })).toBeVisible();
   await select.selectOption("completed");
-  await expect(page.getByText("%11", { exact: true })).toBeVisible();
+  await expect(page.getByText("%9", { exact: true })).toBeVisible();
   await page.getByRole("tab", { name: "Eksik bilgiler" }).click();
   await expect(
     page.getByLabel("Güncel transkript", { exact: true }),
@@ -65,20 +71,39 @@ test("complete sample workflow, editing, source evidence, checklist and clearing
     page.getByText("Sizin beyanınız:", { exact: false }),
   ).toContainText("Aktif lisans öğrencisiyim.");
   await page.getByRole("tab", { name: "Yanıt asistanı" }).click();
-  await page.getByRole("button", { name: "Demo taslağı oluştur" }).click();
+  const card = page.getByRole("article", {
+    name: "1. form sorusu",
+    exact: true,
+  });
   await expect(
-    page.getByText("Önce birkaç detayı netleştirelim."),
+    page.getByLabel("Taslağı gerçek Gemma 4 ile oluştur"),
+  ).toBeChecked();
+  await page.getByLabel("Taslağı gerçek Gemma 4 ile oluştur").uncheck();
+  await card.getByRole("button", { name: "Demo taslağı oluştur" }).click();
+  await expect(
+    page.getByText("Şu soruları da yanıtlarsanız taslağınız güçlenir."),
+  ).toBeVisible();
+  await expect(card.getByLabel("Düzenlenebilir yanıt")).toHaveValue(/Bu burs/);
+  await card
+    .getByLabel("Yanıtına hangi bilgileri ekleyelim?")
+    .fill("Öğrenciyim.");
+  await card.getByRole("button", { name: "Demo taslağı oluştur" }).click();
+  await expect(card.getByLabel("Düzenlenebilir yanıt")).toHaveValue(
+    "Öğrenciyim.",
+  );
+  await expect(
+    page.getByText("Şu soruları da yanıtlarsanız taslağınız güçlenir."),
   ).toBeVisible();
   const facts =
     "Yazılım alanında eğitimimi geliştirmek istiyorum.\nBursu eğitim kitapları için kullanacağım.";
-  await page.getByLabel("Yanıtına hangi bilgileri ekleyelim?").fill(facts);
-  await page.getByRole("button", { name: "Demo taslağı oluştur" }).click();
-  await expect(page.getByLabel("Düzenlenebilir yanıt")).toHaveValue(facts);
-  await page.getByLabel("Düzenlenebilir yanıt").fill("a".repeat(501));
+  await card.getByLabel("Yanıtına hangi bilgileri ekleyelim?").fill(facts);
+  await card.getByRole("button", { name: "Demo taslağı oluştur" }).click();
+  await expect(card.getByLabel("Düzenlenebilir yanıt")).toHaveValue(facts);
+  await card.getByLabel("Düzenlenebilir yanıt").fill("a".repeat(501));
   await expect(
     page.getByText("501 / 500 karakter · Sınır aşıldı"),
   ).toBeVisible();
-  await page.getByLabel("Düzenlenebilir yanıt").fill(facts);
+  await card.getByLabel("Düzenlenebilir yanıt").fill(facts);
   await page.getByRole("tab", { name: "Genel bakış" }).click();
   await page.screenshot({
     path: `test-results/analysis-${test.info().project.name}.png`,

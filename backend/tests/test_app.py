@@ -14,9 +14,9 @@ from backend.app.ai import AIError, AIService
 from backend.app.config import Settings
 from backend.app.demo import DEMO, demo_analysis
 from backend.app.documents import extract_document
-from backend.app.grounding import assemble_draft, validate_grounding, validate_missing
+from backend.app.grounding import assemble_draft, source_units, validate_grounding, validate_missing
 from backend.app.main import app, ai
-from backend.app.schemas import Analysis, DraftSelection, MissingRequest, MissingResult
+from backend.app.schemas import Analysis, GeneratedDraft, MissingRequest, MissingResult
 
 client = TestClient(app)
 
@@ -31,7 +31,7 @@ def test_demo_extracts_all_required_scholarship_items_with_exact_evidence():
     result = response.json()
     assert result["mode"] == "demo"
     analysis = Analysis.model_validate(result["analysis"])
-    assert len(analysis.requirements) == 9
+    assert len(analysis.requirements) == 11
     assert {r.id for r in analysis.requirements if r.kind == "document"} == {"certificate", "transcript"}
     assert next(r for r in analysis.requirements if r.kind == "question").character_limit == 500
     assert all(r.evidence in DEMO["source"] for r in analysis.requirements)
@@ -112,10 +112,12 @@ def test_missing_must_cover_every_requirement_and_not_invent_na():
         validate_missing(result, req)
 
 
-def test_demo_draft_asks_for_personal_information_before_drafting():
+def test_demo_draft_without_personal_information_shows_labeled_sample_and_suggestions():
     response = client.post("/api/draft", json={**context(), "requirement_id": "motivation", "personal_info": ""})
     assert response.status_code == 200
-    assert response.json()["answer"] == ""
+    assert response.json()["answer"] == DEMO["draft_example"]
+    assert response.json()["method"] == "demo_example"
+    assert response.json()["generic"] is True
     assert len(response.json()["follow_up_questions"]) == 2
 
 
@@ -130,16 +132,42 @@ def test_demo_draft_only_uses_explicit_personal_information():
     assert data["character_limit"] == 500
 
 
-def test_draft_rejects_fabricated_achievement_and_over_limit():
-    with pytest.raises(ValueError, match="verilmeyen"):
-        assemble_draft(DraftSelection(excerpts=["Üç yarışma kazandım."], follow_up_questions=[]), "Öğrenciyim.", 500)
+def test_draft_rejects_invented_supporting_fact_and_over_limit():
+    with pytest.raises(ValueError, match="dayanağı"):
+        assemble_draft(GeneratedDraft(answer="Üç yarışma kazandım.", supporting_facts=["Üç yarışma kazandım."], follow_up_questions=[]), "Öğrenciyim.", 500)
     with pytest.raises(ValueError, match="karakter"):
-        assemble_draft(DraftSelection(excerpts=["a" * 501], follow_up_questions=[]), "a" * 501, 500)
+        assemble_draft(GeneratedDraft(answer="a" * 501, supporting_facts=[], follow_up_questions=[]), "", 500)
 
 
-def test_followup_blocks_premature_draft():
-    result = assemble_draft(DraftSelection(excerpts=["Öğrenciyim."], follow_up_questions=["Hedefiniz nedir?"]), "Öğrenciyim.", 500)
-    assert result["answer"] == ""
+def test_followup_suggestions_do_not_remove_available_draft():
+    answer = "Bu burs, eğitim kaynaklarına erişimimi kolaylaştırabilir."
+    result = assemble_draft(GeneratedDraft(answer=answer, supporting_facts=["Öğrenciyim."], follow_up_questions=["Hedefiniz nedir?"]), "Öğrenciyim.", 500)
+    assert result["answer"] == answer
+    assert result["follow_up_questions"] == ["Hedefiniz nedir?"]
+
+
+@pytest.mark.parametrize("placeholder", ["[Yanıtınızı kendi bilgilerinizle buraya yazın.]", "Hedefim [hedefinizi yazın].", "Yanıtınızı buraya yazın."])
+def test_generated_draft_rejects_placeholder_instead_of_showing_success(placeholder):
+    with pytest.raises(ValueError):
+        assemble_draft(GeneratedDraft(answer=placeholder, supporting_facts=[], follow_up_questions=[]), "", 500)
+
+
+def test_generated_draft_without_personal_information_contains_real_text():
+    answer = "Bu destek, öğrenmeye daha fazla odaklanmama katkı sağlayabilir."
+    result = assemble_draft(GeneratedDraft(answer=answer, supporting_facts=[], follow_up_questions=["Hedefiniz nedir?"]), "", 500)
+    assert result["answer"] == answer
+    assert result["method"] == "generated"
+    assert result["generic"] is True
+
+
+@pytest.mark.parametrize("personal", ["a" * 501, "a" * 500 + "\nb"])
+def test_demo_draft_with_excess_information_still_returns_bounded_draft(personal):
+    response = client.post("/api/draft", json={**context(), "requirement_id": "motivation", "personal_info": personal})
+    assert response.status_code == 200
+    result = response.json()
+    assert 0 < result["character_count"] <= 500
+    assert result["answer"] in personal
+    assert result["follow_up_questions"]
 
 
 def test_draft_rejects_unknown_question_and_tampered_analysis():
@@ -205,18 +233,24 @@ def test_external_endpoints_and_other_models_blocked(settings):
 
 
 def test_status_requires_successful_model_response(monkeypatch):
-    service = AIService(Settings())
+    service = AIService(Settings(model="gemma4:e4b"))
     service._request = AsyncMock(side_effect=AIError("offline"))
     result = asyncio.run(service.status())
     assert result["state"] == "unavailable"
-    service._request = AsyncMock(side_effect=[{"model_info": {"general.architecture": "gemma4"}}, {"message": {"content": '{"ok":true}'}}])
+    service._request = AsyncMock(side_effect=[{"version": "test"}, {"models": [{"name": "gemma4:e4b"}]}, {"model_info": {"general.architecture": "gemma4"}}, {"message": {"content": '{"ok":true}'}}])
     result = asyncio.run(service.status())
     assert result["state"] == "connected"
+    assert result["api_key_required"] is False
+    assert result["model_installed"] is True
+    assert result["inference_verified"] is True
+    payload = service._request.call_args.args[2]
+    assert payload["think"] is False
+    assert payload["options"]["num_ctx"] == 8192
 
 
 def test_status_never_connected_before_first_response_even_at_low_uptime(monkeypatch):
     monkeypatch.setattr("backend.app.ai.time.monotonic", lambda: 10.0)
-    service = AIService(Settings())
+    service = AIService(Settings(model="gemma4:e4b"))
     service._request = AsyncMock(side_effect=AIError("offline"))
     assert asyncio.run(service.status())["state"] == "unavailable"
     assert service._request.call_count == 1
@@ -224,20 +258,28 @@ def test_status_never_connected_before_first_response_even_at_low_uptime(monkeyp
 
 @pytest.mark.parametrize("show", [[], {"model_info": [] , "details": "wrong"}, {"details": {"families": 3}}])
 def test_malformed_model_metadata_is_unavailable_instead_of_crashing(show):
-    service = AIService(Settings())
+    service = AIService(Settings(model="gemma4:e4b"))
     service._request = AsyncMock(return_value=show)
     assert asyncio.run(service.status())["state"] == "unavailable"
 
 
 def test_remote_model_on_local_ollama_is_rejected():
-    service = AIService(Settings())
+    service = AIService(Settings(model="gemma4:e4b"))
     service._request = AsyncMock(return_value={"remote_model": "gemma4", "model_info": {"general.architecture": "gemma4"}})
     with pytest.raises(AIError, match="Bulut"):
         asyncio.run(service.verify_local_model())
 
 
 def test_live_analysis_uses_configured_gemma4_and_recovers_one_malformed_response(monkeypatch):
-    request = AsyncMock(side_effect=[{"model_info": {"general.architecture": "gemma4"}}, {"message": {"content": "malformed"}}, {"message": {"content": json.dumps(DEMO["analysis"])}}])
+    units = source_units(DEMO["source"])
+    referenced = json.loads(json.dumps(DEMO["analysis"]))
+    for key in ["name_evidence", "purpose_evidence"]:
+        referenced[key + "_id"] = next(i for i, text in enumerate(units) if referenced[key] in text)
+        del referenced[key]
+    for item in referenced["requirements"] + referenced["ambiguities"]:
+        item["evidence_id"] = next(i for i, text in enumerate(units) if item["evidence"] in text)
+        del item["evidence"]
+    request = AsyncMock(side_effect=[{"model_info": {"general.architecture": "gemma4"}}, {"message": {"content": "malformed"}}, {"message": {"content": json.dumps(referenced)}}])
     monkeypatch.setattr(ai, "_request", request)
     response = client.post("/api/analyze", json={"source": DEMO["source"], "demo": False})
     assert response.status_code == 200

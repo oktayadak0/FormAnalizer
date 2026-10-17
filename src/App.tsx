@@ -36,17 +36,20 @@ import {
 } from "lucide-react";
 import {
   api,
+  ApiError,
   characterCount,
   completion,
   deadlineLabel,
   demoDraft,
   demoMissing,
+  draftInformation,
   infoLabels,
   initialMissing,
   kindLabels,
   newProject,
-  SAMPLE_ANALYSIS,
-  SAMPLE_SOURCE,
+  SAMPLES,
+  findSample,
+  randomSample,
   statusLabels,
 } from "./lib";
 import type {
@@ -56,6 +59,7 @@ import type {
   Fact,
   MissingItem,
   Project,
+  Requirement,
   TaskStatus,
 } from "./types";
 
@@ -93,20 +97,22 @@ export default function App() {
     detail: "",
   });
   const [busy, setBusy] = useState("");
+  const [waitSeconds, setWaitSeconds] = useState(0);
   const [error, setError] = useState("");
   const [notice, setNotice] = useState("");
   const [modal, setModal] = useState<Modal>(null);
   const [mobileNav, setMobileNav] = useState(false);
-  const [selectedQuestion, setSelectedQuestion] = useState("");
-  const [followUps, setFollowUps] = useState<string[]>([]);
+  const [focusedQuestionId, setFocusedQuestionId] = useState("");
+  const [draftQuestionId, setDraftQuestionId] = useState("");
+  const [liveDraft, setLiveDraft] = useState(true);
   const inputRef = useRef<HTMLTextAreaElement>(null);
   const modalCloseRef = useRef<HTMLButtonElement>(null);
   const actionVersion = useRef(0);
+  const aiRequestInFlight = useRef(false);
   const analysis = project.analysis;
+  const sample = findSample(project.source);
   const requirements = analysis?.requirements ?? [];
   const questions = requirements.filter((r) => r.kind === "question");
-  const question =
-    questions.find((r) => r.id === selectedQuestion) ?? questions[0];
   const progress = completion(requirements, project.statuses);
   const missing = project.missing ?? initialMissing(project);
   const completed = requirements.filter(
@@ -114,6 +120,7 @@ export default function App() {
   ).length;
   const deadlines = requirements.filter((r) => r.kind === "deadline");
   const demo = project.mode === "demo";
+  const draftUsesDemo = demo && !liveDraft;
 
   function patch(update: Partial<Project>, id = project.id) {
     setProjects((prev) =>
@@ -121,25 +128,58 @@ export default function App() {
     );
   }
   async function checkAI() {
-    setAI({
+    if (aiRequestInFlight.current) return;
+    aiRequestInFlight.current = true;
+    setAI((prev) => ({
+      ...prev,
       state: "checking",
       label: "Bağlantı kontrol ediliyor",
       detail: "",
-    });
+    }));
     try {
       setAI(await api<AIStatus>("status"));
     } catch {
-      setAI({
+      setAI((prev) => ({
+        ...prev,
         state: "unavailable",
         label: "AI Kullanılamıyor",
         detail:
           "Yerel FastAPI veya Ollama servisi çalışmıyor. Demo kullanıma hazır.",
-      });
+        ollama_reachable: undefined,
+        model_installed: undefined,
+        inference_verified: false,
+      }));
+    } finally {
+      aiRequestInFlight.current = false;
     }
   }
   useEffect(() => {
     void checkAI();
+    const refresh = () => {
+      void checkAI();
+    };
+    window.addEventListener("focus", refresh);
+    return () => window.removeEventListener("focus", refresh);
   }, []);
+  useEffect(() => {
+    if (ai.state !== "checking") return;
+    const timer = setInterval(() => {
+      void checkAI();
+    }, 3000);
+    return () => clearInterval(timer);
+  }, [ai.state]);
+  useEffect(() => {
+    setWaitSeconds(0);
+    if (!busy) return;
+    const timer = setInterval(() => setWaitSeconds((value) => value + 1), 1000);
+    return () => clearInterval(timer);
+  }, [busy]);
+  useEffect(() => {
+    if (tab !== "answers" || !focusedQuestionId) return;
+    const card = document.getElementById(`question-${focusedQuestionId}`);
+    card?.focus({ preventScroll: true });
+    card?.scrollIntoView({ block: "start" });
+  }, [tab, focusedQuestionId]);
   useEffect(() => {
     if (!notice) return;
     const timer = setTimeout(() => setNotice(""), 4500);
@@ -181,8 +221,8 @@ export default function App() {
     setActiveId(id);
     setTab("overview");
     setError("");
-    setFollowUps([]);
-    setSelectedQuestion("");
+    setFocusedQuestionId("");
+    setLiveDraft(true);
     setMobileNav(false);
   }
   function addProject() {
@@ -200,18 +240,21 @@ export default function App() {
   function loadSample() {
     if (busy) return;
     actionVersion.current++;
+    const nextSample = randomSample(project.source);
     patch({
       ...newProject(),
       id: project.id,
-      source: SAMPLE_SOURCE,
-      filename: "umut-bursu-2026.txt",
+      source: nextSample.source,
+      filename: nextSample.filename,
       mode: ai.state === "connected" ? "live" : "demo",
     });
     setTab("overview");
     setError("");
-    setFollowUps([]);
-    setSelectedQuestion("");
-    setNotice("Örnek burs yönergesi eklendi. Analizi başlatabilirsiniz.");
+    setFocusedQuestionId("");
+    setNotice(
+      `${nextSample.analysis.name} örneği eklendi. 3 form sorusu hazır; analizi başlatabilirsiniz.`,
+    );
+    setLiveDraft(true);
   }
   async function analyze() {
     const version = ++actionVersion.current;
@@ -225,17 +268,21 @@ export default function App() {
       )
         throw new Error("Yönerge 30–40.000 karakter arasında olmalıdır.");
       if (demo) {
-        if (project.source !== SAMPLE_SOURCE)
+        if (!sample)
           throw new Error(
-            "Demo yalnızca değiştirilmemiş örnek burs metnini analiz edebilir. Kendi belgeniz için yerel Gemma 4 bağlantısı gerekir.",
+            "Demo yalnızca hazır örnek başvuruları analiz edebilir. Kendi belgeniz için yerel Gemma 4 bağlantısı gerekir.",
           );
         patch(
           {
-            analysis: structuredClone(SAMPLE_ANALYSIS),
+            analysis: structuredClone(sample.analysis),
             statuses: {},
             facts: {},
             personal: {},
             answers: {},
+            answerModes: {},
+            answerKinds: {},
+            answerSuggestions: {},
+            followUpAnswers: {},
             missing: null,
           },
           id,
@@ -254,15 +301,20 @@ export default function App() {
             facts: {},
             personal: {},
             answers: {},
+            answerModes: {},
+            answerKinds: {},
+            answerSuggestions: {},
+            followUpAnswers: {},
             missing: null,
           },
           id,
         );
-        setAI({
+        setAI((prev) => ({
+          ...prev,
           state: "connected",
           label: "Gemma 4 Bağlı",
           detail: "Yerel modelden doğrulanmış analiz alındı.",
-        });
+        }));
       }
       setTab("overview");
       setNotice(
@@ -272,12 +324,22 @@ export default function App() {
       );
     } catch (e) {
       setError((e as Error).message);
-      if (!demo)
-        setAI({
+      if (
+        !demo &&
+        e instanceof ApiError &&
+        [
+          "ollama_unreachable",
+          "ollama_timeout",
+          "model_missing",
+          "backend_unreachable",
+        ].includes(e.code)
+      )
+        setAI((prev) => ({
+          ...prev,
           state: "unavailable",
           label: "AI Kullanılamıyor",
           detail: "Son analiz tamamlanamadı. Bağlantıyı yeniden kontrol edin.",
-        });
+        }));
     } finally {
       setBusy("");
     }
@@ -327,6 +389,10 @@ export default function App() {
         facts: {},
         personal: {},
         answers: {},
+        answerModes: {},
+        answerKinds: {},
+        answerSuggestions: {},
+        followUpAnswers: {},
         missing: null,
       });
       setNotice("Belge metni yerel olarak okundu. Analizi başlatabilirsiniz.");
@@ -370,39 +436,118 @@ export default function App() {
       setBusy("");
     }
   }
-  async function makeDraft() {
-    if (!question) return;
+  async function makeDraft(question: Requirement) {
+    if (busy) return;
+    const targetProjectId = project.id;
     setError("");
+    setDraftQuestionId(question.id);
     setBusy("draft");
-    setFollowUps([]);
     try {
-      const personal = project.personal[question.id] ?? "";
-      const result = demo
-        ? demoDraft(personal, question.character_limit)
+      const information = draftInformation(
+        project.personal[question.id] ?? "",
+        project.followUpAnswers?.[question.id],
+      );
+      const result = draftUsesDemo
+        ? demoDraft(
+            information.facts,
+            question.character_limit,
+            sample?.question_examples[question.id],
+          )
         : await api<Draft>("draft", {
             source: project.source,
             analysis,
             demo: false,
             requirement_id: question.id,
-            personal_info: personal,
+            personal_info: information.personal_info,
+            follow_up_answers: information.follow_up_answers,
           });
-      setFollowUps(result.follow_up_questions);
-      patch({ answers: { ...project.answers, [question.id]: result.answer } });
+      setProjects((current) =>
+        current.map((currentProject) =>
+          currentProject.id !== targetProjectId
+            ? currentProject
+            : {
+                ...currentProject,
+                answers: {
+                  ...currentProject.answers,
+                  [question.id]: result.answer,
+                },
+                answerModes: {
+                  ...currentProject.answerModes,
+                  [question.id]: result.mode,
+                },
+                answerKinds: {
+                  ...currentProject.answerKinds,
+                  [question.id]: result.generic ? "generic" : "personal",
+                },
+                answerSuggestions: {
+                  ...currentProject.answerSuggestions,
+                  [question.id]: result.follow_up_questions,
+                },
+              },
+        ),
+      );
       if (result.answer)
         setNotice(
-          demo
-            ? "Demo düzenlemesi hazır: yalnızca yazdığınız satırlar birleştirildi."
+          result.mode === "demo"
+            ? "Demo yanıtı hazır. İstersen düzenleyebilirsin."
             : "Gemma 4 önerisi hazır. Göndermeden önce kontrol edin.",
+        );
+      else
+        setNotice(
+          "Paylaştığınız bilgilerle taslak hazırlanamadı. Bilgilerinizi kontrol edin.",
         );
     } catch (e) {
       setError((e as Error).message);
+      if (
+        e instanceof ApiError &&
+        [
+          "ollama_unreachable",
+          "ollama_timeout",
+          "model_missing",
+          "backend_unreachable",
+        ].includes(e.code)
+      ) {
+        setAI((prev) => ({
+          ...prev,
+          state: "unavailable",
+          label:
+            e.code === "model_missing"
+              ? "Gemma 4 Kurulu Değil"
+              : "AI Kullanılamıyor",
+          detail: e.message,
+          code: e.code,
+        }));
+      }
     } finally {
       setBusy("");
+      setDraftQuestionId("");
     }
   }
-  async function copyAnswer() {
+  function updateFollowUpAnswer(
+    questionId: string,
+    followUp: string,
+    value: string,
+  ) {
+    setProjects((current) =>
+      current.map((item) =>
+        item.id !== project.id
+          ? item
+          : {
+              ...item,
+              followUpAnswers: {
+                ...item.followUpAnswers,
+                [questionId]: {
+                  ...item.followUpAnswers?.[questionId],
+                  [followUp]: value,
+                },
+              },
+            },
+      ),
+    );
+  }
+  async function copyAnswer(questionId: string) {
     try {
-      await navigator.clipboard.writeText(project.answers[question.id] ?? "");
+      await navigator.clipboard.writeText(project.answers[questionId] ?? "");
       setNotice("Yanıt panoya kopyalandı.");
     } catch {
       setError(
@@ -535,11 +680,11 @@ export default function App() {
           </div>
           <div className="header-right">
             <button
-              className={`ai-status ${demo ? "demo" : ai.state}`}
+              className={`ai-status ${demo && !liveDraft ? "demo" : ai.state}`}
               onClick={() => setModal("settings")}
             >
               <span className="status-dot" />
-              {demo ? "Demo Modu" : ai.label}
+              {demo && !liveDraft ? "Demo Modu" : ai.label}
               <ChevronDown size={12} />
             </button>
             <span className="header-divider" />
@@ -631,7 +776,8 @@ export default function App() {
               <div className="demo-banner">
                 <span className="demo-badge">ÖRNEK VERİ</span>
                 <span>
-                  Bu başvuru ve sonuçları demo içindir. Canlı AI kullanılmıyor.
+                  Bu yönerge analizi örnek veridir; analiz için canlı AI
+                  kullanılmadı.
                 </span>
               </div>
             )}
@@ -712,7 +858,7 @@ export default function App() {
                     40.000
                   </span>
                 </div>
-                {project.source === SAMPLE_SOURCE && (
+                {sample && (
                   <label className="demo-switch">
                     <input
                       type="checkbox"
@@ -740,7 +886,7 @@ export default function App() {
                       <Sparkles size={16} />
                     )}
                     {busy === "analyze"
-                      ? "Analiz ediliyor…"
+                      ? `Analiz ediliyor · ${waitSeconds} sn`
                       : busy === "upload"
                         ? "Belge okunuyor…"
                         : "Başvurumu Analiz Et"}
@@ -879,9 +1025,8 @@ export default function App() {
                                   className="icon-button"
                                   aria-label={`${r.description} sorusunu yanıtla`}
                                   onClick={() => {
-                                    setSelectedQuestion(r.id);
+                                    setFocusedQuestionId(r.id);
                                     setTab("answers");
-                                    setFollowUps([]);
                                   }}
                                 >
                                   <ArrowUpRight size={18} />
@@ -1020,7 +1165,7 @@ export default function App() {
                   )}
                   {tab === "answers" && (
                     <section className="answer-section">
-                      {!question ? (
+                      {!questions.length ? (
                         <div className="card empty-state">
                           <MessageSquareText size={28} />
                           <h3>Bu yönergede form sorusu bulunamadı.</h3>
@@ -1030,167 +1175,328 @@ export default function App() {
                         </div>
                       ) : (
                         <>
-                          <label className="field-label" htmlFor="question">
-                            Yanıtlamak istediğin soru
-                          </label>
-                          <select
-                            id="question"
-                            className="question-select"
-                            value={question.id}
-                            onChange={(e) => {
-                              setSelectedQuestion(e.target.value);
-                              setFollowUps([]);
-                            }}
-                          >
-                            {questions.map((q) => (
-                              <option key={q.id} value={q.id}>
-                                {q.description}
-                              </option>
-                            ))}
-                          </select>
-                          <div className="question-callout">
-                            <span className="section-kicker">FORM SORUSU</span>
-                            <h3>{question.description}</h3>
-                            <span>
-                              {question.character_limit
-                                ? `En fazla ${question.character_limit} karakter`
-                                : "Kaynakta karakter sınırı belirtilmemiş"}
-                            </span>
-                            <Evidence text={question.evidence} />
-                          </div>
-                          <div className="card personal-card">
-                            <label className="field-label" htmlFor="personal">
-                              Yanıtına hangi bilgileri ekleyelim?
-                            </label>
-                            <p>
-                              Hedefini ve somut katkıyı ayrı satırlarda, kendi
-                              cümlelerinle yaz. Verilmemiş bilgiler eklenmez.
-                            </p>
-                            <textarea
-                              id="personal"
-                              rows={5}
-                              maxLength={6000}
-                              disabled={!!busy}
-                              value={project.personal[question.id] ?? ""}
-                              placeholder={
-                                "Eğitim hedefim…\nBu bursun hedefime katkısı…"
-                              }
-                              onChange={(e) => {
-                                patch({
-                                  personal: {
-                                    ...project.personal,
-                                    [question.id]: e.target.value,
-                                  },
-                                  answers: {
-                                    ...project.answers,
-                                    [question.id]: "",
-                                  },
-                                });
-                                setFollowUps([]);
-                              }}
-                            />
-                            <div className="personal-footer">
-                              <span>
-                                <LockKeyhole size={13} /> Yalnızca senin
-                                paylaştıkların
-                              </span>
-                              <button
-                                className="button primary compact"
-                                disabled={!!busy}
-                                onClick={() => void makeDraft()}
-                              >
-                                {busy === "draft" ? (
-                                  <LoaderCircle className="spin" size={15} />
-                                ) : (
-                                  <Sparkles size={15} />
-                                )}
-                                {demo
-                                  ? "Demo taslağı oluştur"
-                                  : "Gemma 4 ile taslak oluştur"}
-                              </button>
-                            </div>
-                          </div>
-                          {followUps.length > 0 && (
-                            <div className="followup-box" role="status">
-                              <strong>Önce birkaç detayı netleştirelim.</strong>
-                              {followUps.map((q) => (
-                                <p key={q}>
-                                  <CircleHelp size={14} />
-                                  {q}
-                                </p>
-                              ))}
-                              <span>
-                                Yanıtlarını yukarıdaki bilgi alanına ekleyip
-                                yeniden dene.
-                              </span>
-                            </div>
-                          )}
-                          <div className="card draft-card">
-                            <div className="section-heading">
-                              <h3>Senin yanıtın</h3>
-                              <span className="draft-label">
-                                {demo
-                                  ? "Demo düzenlemesi"
-                                  : "AI önerisi · Düzenlenebilir"}
-                              </span>
-                            </div>
-                            <label htmlFor="answer" className="sr-only">
-                              Düzenlenebilir yanıt
-                            </label>
-                            <textarea
-                              id="answer"
-                              rows={6}
-                              placeholder="Taslağın burada görünecek. İstersen yanıtını kendin de yazabilirsin."
-                              value={project.answers[question.id] ?? ""}
-                              onChange={(e) =>
-                                patch({
-                                  answers: {
-                                    ...project.answers,
-                                    [question.id]: e.target.value,
-                                  },
-                                })
-                              }
-                            />
-                            <div className="draft-footer">
-                              <span
-                                className={
-                                  question.character_limit &&
-                                  characterCount(
-                                    project.answers[question.id] ?? "",
-                                  ) > question.character_limit
-                                    ? "text-danger"
-                                    : "muted"
-                                }
-                                aria-live="polite"
-                              >
-                                {characterCount(
-                                  project.answers[question.id] ?? "",
-                                )}
-                                {question.character_limit
-                                  ? ` / ${question.character_limit}`
-                                  : ""}{" "}
-                                karakter
-                                {question.character_limit &&
-                                characterCount(
-                                  project.answers[question.id] ?? "",
-                                ) > question.character_limit
-                                  ? " · Sınır aşıldı"
-                                  : ""}
-                              </span>
+                          <div className="info-note answer-ai-note">
+                            <ShieldCheck size={16} />
+                            <div>
+                              <strong>
+                                {draftUsesDemo
+                                  ? "Demo taslağı · AI üretimi değil"
+                                  : `Yerel AI · ${ai.model ?? "Gemma 4"}`}
+                              </strong>
+                              <p>
+                                API key gerekmez.{" "}
+                                {draftUsesDemo
+                                  ? "Demo, hazır örnek yanıtı veya yazdığınız bilgileri gösterir. Yeni bir yanıt yazdırmak için gerçek Gemma 4 seçeneğini açın."
+                                  : ai.detail ||
+                                    "Gemma 4 durumu Model ve bağlantı ekranından kontrol edilebilir."}
+                              </p>
+                              {demo && (
+                                <label className="demo-switch">
+                                  <input
+                                    type="checkbox"
+                                    checked={liveDraft}
+                                    disabled={!!busy}
+                                    onChange={(e) => {
+                                      setLiveDraft(e.target.checked);
+                                    }}
+                                  />
+                                  Taslağı gerçek Gemma 4 ile oluştur
+                                </label>
+                              )}
                               <button
                                 className="button secondary compact"
-                                disabled={!project.answers[question.id]}
-                                onClick={() => void copyAnswer()}
+                                onClick={() => {
+                                  setModal("settings");
+                                  void checkAI();
+                                }}
                               >
-                                <Copy size={14} /> Kopyala
+                                Model kurulumunu kontrol et
                               </button>
                             </div>
-                            <p className="disclosure">
-                              {demo
-                                ? "Demo yalnızca yazdığınız satırları birleştirir; AI üretimi değildir."
-                                : "Gemma 4, verdiğiniz ifadeleri seçer ve sıralar. Alıntılar beyanınızla birebir doğrulanır."}{" "}
-                              Son yanıtın doğruluğunu kontrol edin.
+                          </div>
+                          <div className="answer-list-heading">
+                            <h3>Form soruları</h3>
+                            <p>
+                              {questions.length} sorunun tamamı aşağıda. Her
+                              yanıtı kendi alanında hazırlayabilirsin.
                             </p>
+                          </div>
+                          <div className="question-answer-list">
+                            {questions.map((question, index) => {
+                              const answerMode =
+                                project.answerModes?.[question.id] ??
+                                (draftUsesDemo ? "demo" : "live");
+                              const responses =
+                                project.followUpAnswers?.[question.id] ?? {};
+                              const followUps = [
+                                ...new Set([
+                                  ...(project.answerSuggestions?.[
+                                    question.id
+                                  ] ?? []),
+                                  ...Object.keys(responses).filter((key) =>
+                                    responses[key].trim(),
+                                  ),
+                                ]),
+                              ];
+                              const answeredCount = Object.values(
+                                responses,
+                              ).filter((value) => value.trim()).length;
+                              const isGenerating =
+                                busy === "draft" &&
+                                draftQuestionId === question.id;
+                              return (
+                                <article
+                                  className="question-answer"
+                                  key={question.id}
+                                  id={`question-${question.id}`}
+                                  aria-label={`${index + 1}. form sorusu`}
+                                  tabIndex={-1}
+                                >
+                                  <div className="question-callout">
+                                    <span className="section-kicker">
+                                      FORM SORUSU {index + 1} /{" "}
+                                      {questions.length}
+                                    </span>
+                                    <h3>{question.description}</h3>
+                                    <span>
+                                      {question.character_limit
+                                        ? `En fazla ${question.character_limit} karakter`
+                                        : "Kaynakta karakter sınırı belirtilmemiş"}
+                                    </span>
+                                    <Evidence text={question.evidence} />
+                                  </div>
+                                  <div className="card personal-card">
+                                    <label
+                                      className="field-label"
+                                      htmlFor={`personal-${question.id}`}
+                                    >
+                                      Yanıtına hangi bilgileri ekleyelim?
+                                    </label>
+                                    <p>
+                                      İstersen hedefini ve eklemek istediğin
+                                      bilgileri yaz. Boş bırakırsan Gemma 4
+                                      soruya uygun genel bir yanıt önerir.
+                                    </p>
+                                    <textarea
+                                      id={`personal-${question.id}`}
+                                      rows={3}
+                                      maxLength={6000}
+                                      disabled={isGenerating}
+                                      value={
+                                        project.personal[question.id] ?? ""
+                                      }
+                                      placeholder={
+                                        "Bu soruyla ilgili hedeflerini, planlarını veya deneyimlerini ekleyebilirsin…"
+                                      }
+                                      onChange={(e) => {
+                                        patch({
+                                          personal: {
+                                            ...project.personal,
+                                            [question.id]: e.target.value,
+                                          },
+                                          answers: {
+                                            ...project.answers,
+                                            [question.id]: "",
+                                          },
+                                        });
+                                      }}
+                                    />
+                                    <div className="personal-footer">
+                                      <span>
+                                        <LockKeyhole size={13} /> Yalnızca senin
+                                        paylaştıkların
+                                      </span>
+                                      <button
+                                        className="button primary compact"
+                                        disabled={!!busy}
+                                        onClick={() => void makeDraft(question)}
+                                      >
+                                        {isGenerating ? (
+                                          <LoaderCircle
+                                            className="spin"
+                                            size={15}
+                                          />
+                                        ) : (
+                                          <Sparkles size={15} />
+                                        )}
+                                        {isGenerating
+                                          ? `Yanıt bekleniyor · ${waitSeconds} sn`
+                                          : draftUsesDemo
+                                            ? "Demo taslağı oluştur"
+                                            : "Gemma 4 ile taslak oluştur"}
+                                      </button>
+                                    </div>
+                                  </div>
+                                  {isGenerating && (
+                                    <div className="info-note" role="status">
+                                      <LoaderCircle
+                                        size={16}
+                                        className="spin"
+                                      />
+                                      <span>
+                                        Yerel model yanıt hazırlıyor. İlk
+                                        yükleme ve yanıt cihazın hızına göre bir
+                                        dakika kadar sürebilir. Ayrıntılar
+                                        run.bat penceresinde görünür.
+                                      </span>
+                                    </div>
+                                  )}
+                                  <div className="card draft-card">
+                                    <div className="section-heading">
+                                      <h3>Senin yanıtın</h3>
+                                      <span className="draft-label">
+                                        {!project.answers[question.id]
+                                          ? "Yanıt henüz hazırlanmadı"
+                                          : answerMode === "demo"
+                                            ? "Demo düzenlemesi"
+                                            : answerMode === "manual"
+                                              ? "Kendi yanıtın"
+                                              : "AI önerisi · Düzenlenebilir"}
+                                      </span>
+                                    </div>
+                                    <label
+                                      htmlFor={`answer-${question.id}`}
+                                      className="sr-only"
+                                    >
+                                      Düzenlenebilir yanıt
+                                    </label>
+                                    <textarea
+                                      id={`answer-${question.id}`}
+                                      rows={5}
+                                      disabled={isGenerating}
+                                      placeholder="Taslağın burada görünecek. İstersen yanıtını kendin de yazabilirsin."
+                                      value={project.answers[question.id] ?? ""}
+                                      onChange={(e) =>
+                                        patch({
+                                          answers: {
+                                            ...project.answers,
+                                            [question.id]: e.target.value,
+                                          },
+                                          answerModes: {
+                                            ...project.answerModes,
+                                            [question.id]: "manual",
+                                          },
+                                        })
+                                      }
+                                    />
+                                    <div className="draft-footer">
+                                      <span
+                                        className={
+                                          question.character_limit &&
+                                          characterCount(
+                                            project.answers[question.id] ?? "",
+                                          ) > question.character_limit
+                                            ? "text-danger"
+                                            : "muted"
+                                        }
+                                        aria-live="polite"
+                                      >
+                                        {characterCount(
+                                          project.answers[question.id] ?? "",
+                                        )}
+                                        {question.character_limit
+                                          ? ` / ${question.character_limit}`
+                                          : ""}{" "}
+                                        karakter
+                                        {question.character_limit &&
+                                        characterCount(
+                                          project.answers[question.id] ?? "",
+                                        ) > question.character_limit
+                                          ? " · Sınır aşıldı"
+                                          : ""}
+                                      </span>
+                                      <button
+                                        className="button secondary compact"
+                                        disabled={!project.answers[question.id]}
+                                        onClick={() =>
+                                          void copyAnswer(question.id)
+                                        }
+                                      >
+                                        <Copy size={14} /> Kopyala
+                                      </button>
+                                    </div>
+                                    <p className="disclosure">
+                                      {answerMode === "demo"
+                                        ? "Bu, hazır bir demo örneği veya kendi yazdığınız metindir; AI üretimi değildir."
+                                        : answerMode === "manual"
+                                          ? "Bu yanıtı siz düzenlediniz."
+                                          : project.answerKinds?.[
+                                                question.id
+                                              ] === "generic"
+                                            ? "Kişisel bilgi paylaşmadığınız için bu genel bir yanıt önerisidir. Kendi durumunuza göre düzenleyin."
+                                            : "Gemma 4, paylaştığınız bilgilerle yeni bir yanıt yazar."}{" "}
+                                      Göndermeden önce tüm kişisel ifadelerin
+                                      doğruluğunu kontrol edin.
+                                    </p>
+                                  </div>
+                                  {followUps.length > 0 && (
+                                    <section
+                                      className="followup-box"
+                                      aria-label="Taslağı geliştirmek için ek sorular"
+                                    >
+                                      <strong>
+                                        Şu soruları da yanıtlarsanız taslağınız
+                                        güçlenir.
+                                      </strong>
+                                      {followUps.map((q, followUpIndex) => (
+                                        <div className="followup-field" key={q}>
+                                          <label
+                                            htmlFor={`followup-${question.id}-${followUpIndex}`}
+                                          >
+                                            <CircleHelp size={14} />
+                                            {q}
+                                          </label>
+                                          <textarea
+                                            id={`followup-${question.id}-${followUpIndex}`}
+                                            rows={2}
+                                            maxLength={1500}
+                                            disabled={isGenerating}
+                                            placeholder="Cevabını buraya yaz…"
+                                            value={responses[q] ?? ""}
+                                            onChange={(event) =>
+                                              updateFollowUpAnswer(
+                                                question.id,
+                                                q,
+                                                event.target.value,
+                                              )
+                                            }
+                                          />
+                                        </div>
+                                      ))}
+                                      <span>
+                                        Cevapların mevcut bilgilerine eklenir.
+                                        İstersen boş bırakabilir veya daha sonra
+                                        düzenleyebilirsin.
+                                      </span>
+                                      <div className="followup-actions">
+                                        <span>
+                                          {answeredCount} soru yanıtlandı
+                                        </span>
+                                        <button
+                                          className="button primary compact"
+                                          disabled={!!busy || !answeredCount}
+                                          onClick={() =>
+                                            void makeDraft(question)
+                                          }
+                                        >
+                                          {isGenerating ? (
+                                            <LoaderCircle
+                                              size={15}
+                                              className="spin"
+                                            />
+                                          ) : (
+                                            <Sparkles size={15} />
+                                          )}
+                                          {isGenerating
+                                            ? `Taslak güncelleniyor · ${waitSeconds} sn`
+                                            : "Yanıtlarımla taslağı güncelle"}
+                                        </button>
+                                      </div>
+                                    </section>
+                                  )}
+                                </article>
+                              );
+                            })}
                           </div>
                         </>
                       )}
@@ -1200,7 +1506,7 @@ export default function App() {
               </>
             )}
 
-            {!analysis && (
+            {
               <button
                 className="sample-card"
                 disabled={!!busy}
@@ -1210,17 +1516,25 @@ export default function App() {
                   <GraduationCap size={26} />
                 </span>
                 <span>
-                  <strong>Önce bir örnekle tanış.</strong>
+                  <strong>
+                    {sample
+                      ? "Başka bir örnek dene."
+                      : "Önce bir örnekle tanış."}
+                  </strong>
                   <span>
-                    Umut Bursu 2026 <span className="sample-dot">·</span> Örnek
-                    başvuruyla tüm adımları keşfet.
+                    {SAMPLES.length} farklı başvuru{" "}
+                    <span className="sample-dot">·</span> Her birinde 3 form
+                    sorusu.
+                    {sample
+                      ? ` Şu an: ${sample.category}.`
+                      : " Burs, staj, yarışma ve daha fazlası."}
                   </span>
                 </span>
                 <span className="sample-cta">
-                  Örneği aç <ArrowRight size={16} />
+                  Örnek ekle <ArrowRight size={16} />
                 </span>
               </button>
-            )}
+            }
             {!analysis && (
               <div className="benefits">
                 <div>
@@ -1387,18 +1701,23 @@ export default function App() {
               </div>
               {analysis ? (
                 <>
-                  {deadlines.length ? deadlines.map((deadline) => (
-                    <div className="risk-item" key={deadline.id}>
-                      <CalendarDays size={14} />
-                      <div>
-                        <strong>{deadline.description}</strong>
-                        <span>{deadlineLabel(deadline.deadline)}</span>
+                  {deadlines.length ? (
+                    deadlines.map((deadline) => (
+                      <div className="risk-item" key={deadline.id}>
+                        <CalendarDays size={14} />
+                        <div>
+                          <strong>{deadline.description}</strong>
+                          <span>{deadlineLabel(deadline.deadline)}</span>
+                        </div>
                       </div>
-                    </div>
-                  )) : (
+                    ))
+                  ) : (
                     <div className="risk-item">
                       <CalendarDays size={14} />
-                      <div><strong>Son tarih doğrulanmalı</strong><span>Kaynakta kesin son tarih bulunamadı.</span></div>
+                      <div>
+                        <strong>Son tarih doğrulanmalı</strong>
+                        <span>Kaynakta kesin son tarih bulunamadı.</span>
+                      </div>
                     </div>
                   )}
                   {requirements
@@ -1406,8 +1725,11 @@ export default function App() {
                       (r) =>
                         r.required &&
                         (r.kind === "eligibility" ||
-                          (r.kind === "document" && project.statuses[r.id] !== "completed") ||
-                          (r.kind === "question" && (!project.answers[r.id]?.trim() || project.statuses[r.id] !== "completed"))),
+                          (r.kind === "document" &&
+                            project.statuses[r.id] !== "completed") ||
+                          (r.kind === "question" &&
+                            (!project.answers[r.id]?.trim() ||
+                              project.statuses[r.id] !== "completed"))),
                     )
                     .map((r) => (
                       <div className="risk-item" key={r.id}>
@@ -1555,8 +1877,9 @@ export default function App() {
                   <li>
                     <strong>Adımları tamamla, yanıtını hazırla.</strong>
                     <p>
-                      Durumları güncelle. Yanıt asistanına kendi bilgilerini
-                      yaz; eksikse sana soru sorulsun.
+                      Durumları güncelle. Yanıt asistanına kendi bilgilerini yaz
+                      ve taslağını oluştur. Ek sorular, yanıtının altında isteğe
+                      bağlı öneriler olarak görünür.
                     </p>
                   </li>
                 </ol>
@@ -1587,8 +1910,53 @@ export default function App() {
                   yalnızca yerel modelden geçerli bir yanıt alındığında
                   gösterilir.
                 </p>
-                <p>Kurulum: Ollama'yı güncelle, ardından terminalde:</p>
-                <pre>ollama pull gemma4:e4b{"\n"}ollama run gemma4:e4b</pre>
+                <div className="info-note">
+                  <ShieldCheck size={16} />
+                  <strong>
+                    API key gerekmez. Gemma 4, Ollama üzerinden bu bilgisayarda
+                    çalışır.
+                  </strong>
+                </div>
+                <dl className="model-diagnostics">
+                  <div>
+                    <dt>Seçili model</dt>
+                    <dd>{ai.model ?? "Sunucuya bağlanınca görülecek"}</dd>
+                  </div>
+                  <div>
+                    <dt>Ollama servisi</dt>
+                    <dd>
+                      {ai.ollama_reachable === true
+                        ? "Ulaşılabiliyor"
+                        : ai.ollama_reachable === false
+                          ? "Ulaşılamıyor"
+                          : "Henüz doğrulanmadı"}
+                    </dd>
+                  </div>
+                  <div>
+                    <dt>Model kurulu mu?</dt>
+                    <dd>
+                      {ai.model_installed === true
+                        ? "Evet"
+                        : ai.model_installed === false
+                          ? "Hayır"
+                          : "Servis bağlantısı olmadan doğrulanamaz"}
+                    </dd>
+                  </div>
+                  <div>
+                    <dt>Gerçek yanıt</dt>
+                    <dd>
+                      {ai.inference_verified === true
+                        ? "Alındı"
+                        : "Henüz doğrulanmadı"}
+                    </dd>
+                  </div>
+                </dl>
+                <p>Otomatik kurulum ve başlatma (proje klasöründe):</p>
+                <pre>installer.bat{"\n"}run.bat</pre>
+                <p>
+                  <code>installer.bat -Demo</code> modeli indirmez. API anahtarı
+                  eklemek bu eksikliği gidermez.
+                </p>
                 <p>
                   FastAPI:{" "}
                   <code>python -m uvicorn backend.app.main:app --reload</code>
@@ -1630,7 +1998,7 @@ export default function App() {
                     onClick={() => {
                       actionVersion.current++;
                       patch({ ...newProject(), id: project.id });
-                      setFollowUps([]);
+                      setFocusedQuestionId("");
                       setError("");
                       setTab("overview");
                       setModal(null);

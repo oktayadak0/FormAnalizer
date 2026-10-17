@@ -64,13 +64,14 @@ npm ci
 npm run dev
 ```
 
-1. **Önce bir örnekle tanış → Örneği aç** düğmesine basın.
+1. **Örnek ekle** düğmesine basın. Burs, staj, hackathon, gönüllülük, girişimcilik, araştırma, sürdürülebilirlik, tasarım, açık kaynak, değişim, mentorluk, sosyal proje ve yaratıcı yazarlık için 13 örnek vardır. Her örnekte üç form sorusu, belge şartları, karakter sınırları ve son tarih bulunur. Düğme her basışta mevcut örnekten farklı bir örneği rastgele getirir; analiz sonrasında da kullanılabilir.
 2. **Önceden hazırlanmış demo sonuçlarını kullan** seçeneği açık kalsın.
 3. **Başvurumu Analiz Et** düğmesine basın.
 4. Kaynak cümlelerini açın, kontrol listesindeki durumları değiştirin.
 5. **Eksik bilgiler** sekmesinde beyan yazıp **Karşılaştır** düğmesine basın.
 6. **Yanıt asistanı** sekmesinde önce boş bilgiyle deneyin; takip soruları görünür.
-7. Hedefinizi ve bursun somut katkısını ayrı satırlara yazın. Demo taslağı bu satırları birleştirir; AI üretimi değildir.
+7. Yanıt asistanında tüm form soruları alt alta görünür. Her sorunun kendi bilgi alanı, **Gemma 4 ile taslak oluştur** düğmesi, düzenlenebilir yanıtı, karakter sayacı ve kopyalama düğmesi vardır. Öneri soruları ilgili yanıtın altında kalır. Bir sorunun yanıtını oluşturmak diğer soruların metinlerini silmez. Bilgi alanı isteğe bağlıdır: boşken genel bir öneri, doldurulduğunda bu bilgilere göre bir yanıt hazırlanır. Örnek analizi kullanırken de taslak için varsayılan olarak gerçek model çağrılır. Gerçek modeli kapatırsanız demo, hazır örnek yanıtı veya kendi metninizi gösterir; AI üretimi değildir.
+8. Taslağın altındaki öneri sorularını doğrudan kendi cevap alanlarında yanıtlayın. **Yanıtlarımla taslağı güncelle** düğmesi önceki kişisel bilgileri ve ek cevapları birlikte modele gönderir. Cevaplar o form sorusuna bağlı kalır; güncellemeden sonra da düzenlenebilir. Boş bırakılan sorular gönderilmez. Ek cevaplar soru başına en fazla 1.500, ilk bilgilerle toplam en fazla 6.000 karakter olabilir. Model hatasında mevcut taslak ve yazdığınız cevaplar korunur.
 8. Yanıtı düzenleyin, karakter sayacını ve kopyalama düğmesini kullanın.
 
 Demo tüm ekranda etiketlenir. Sadece `shared/demo.json` içindeki **değiştirilmemiş** kaynak için önceden hazırlanmış analiz gösterilir. Kullanıcının kendi belgesine demo sonuçları uygulanmaz. Backend demosu için `.env` içinde `DEMO_MODE=true` kullanabilirsiniz; istemcinin yine açıkça `demo:true` göndermesi gerekir. Bu ayar gerçek analiz isteklerini örneğe dönüştürmez.
@@ -83,7 +84,9 @@ powershell -ExecutionPolicy Bypass -File scripts/start.ps1 -Demo
 
 ## Gemma 4 / Ollama kurulumu
 
-17 Ekim 2026 tarihinde resmî [Ollama model kataloğunda](https://ollama.com/library/gemma4) ve [gemma4:e4b model sayfasında](https://ollama.com/library/gemma4:e4b) yerel etiket doğrulandı. [Ollama yapılandırılmış çıktı belgeleri](https://docs.ollama.com/capabilities/structured-outputs), `/api/chat` isteğinde JSON şeması kullanımını belgeliyor. Katalog desteği doğrulanmıştır; bu geliştirme cihazında Ollama/Gemma 4 kurulumu veya gerçek çıkarım yapılmamıştır. Bir minimum Ollama sürümü varsayılmıyor; güncel kararlı sürümü kullanın ve aşağıdaki yanıt kontrolünü yapın.
+**Yerel Ollama için API key gerekmez.** Bu cihazda bulunan model `gemma4:e2b` olduğu için yerel `.env` seçimi buna ayarlanmıştır. Modelin adı `.env` içinde yazıyor diye kurulu sayılmaz; uygulama servis erişimini, model listesini ve gerçek yanıtı ayrı ayrı kontrol eder. `Model ve bağlantı` ekranı bu durumları gösterir. `run.bat` varsayılan olarak canlı debug kayıtlarını CMD'ye ve `.tools/logs/run.log` dosyasına yazar.
+
+17 Ekim 2026 tarihinde resmî [Ollama model kataloğunda](https://ollama.com/library/gemma4) ve [gemma4:e4b model sayfasında](https://ollama.com/library/gemma4:e4b) yerel etiket doğrulandı. [Ollama yapılandırılmış çıktı belgeleri](https://docs.ollama.com/capabilities/structured-outputs), `/api/chat` isteğinde JSON şeması kullanımını belgeliyor. Son tanı çalışmasında Ollama 0.40.5 üzerinde kurulu `gemma4:e2b` ile gerçek JSON sağlık yanıtı ve 297 karakterlik canlı taslak doğrulandı. Yeni kurulum örneği aşağıda E4B'yi kullanır; zaten kurulu E2B için `.env` dosyasında `OLLAMA_MODEL=gemma4:e2b` seçilmelidir. Güncel kararlı Ollama sürümü önerilir.
 
 1. Güncel [Ollama](https://ollama.com/download) kurun ve çalıştırın. Masaüstü uygulaması servisi zaten açıyorsa ayrıca `ollama serve` başlatmayın.
 2. Yerel modeli indirin ve deneyin:
@@ -128,11 +131,11 @@ E4B indirmesi ve çalışma belleği birkaç GB gerektirir; kesin ihtiyaç cihaz
 
 Tüm canlı AI istekleri **FastAPI → yerel Ollama → Gemma 4** yolundan gider. `ai.py` Pydantic JSON şemasını Ollama `format` alanına koyar. Analiz, eksik bilgi ve taslak için ayrı sistem istemleri kullanılır. Çıktı önce Pydantic ile, sonra `grounding.py` ile doğrulanır:
 
-1. Tüm kaynak alıntıları özgün metinde kesintisiz ve birebir bulunmalıdır.
+1. Analizde model numaralı kaynak bölümlerini seçer. Sunucu alıntıyı doğrudan o bölümden alır; PDF satır sonları ve farklı boşluk karakterleri korunur. Kaynakta bulunmayan bölüm kimlikleri reddedilir. Tüm kaynak alıntıları özgün metinde kesintisiz ve birebir bulunmalıdır.
 2. Karakter sınırı kaynakta aynı sayı ve `karakter` sözcüğüyle bulunmalıdır.
 3. Kesin tarihler gün, ay, yıl, saat ve Türkiye/UTC+3 saat dilimiyle desteklenmelidir. Belirsiz tarih metin olarak gösterilir; yapay bir kesin tarih üretilmez.
 4. Eksik bilgi sonucu tüm gereklilikleri birer kez kapsamalıdır; sağlandı durumu ilgili kullanıcı beyanından alıntı gerektirir. Uygulanmıyor durumu kullanıcının açık seçimi ve açıklaması olmadan kabul edilmez.
-5. **Taslak güvenliği:** Gemma 4, kullanıcının ifadelerini seçer ve sıralar. Her parça kullanıcı metninde birebir bulunmalıdır. Modelin yeni kişisel iddia yazmasına izin verilmez. Kullanıcı sonrasında metni serbestçe düzenleyebilir.
+5. **Yanıt üretimi:** Gemma 4 doğrudan yeni bir paragraf yazar; yalnızca alıntıları birleştirmez. Kullanılan kişisel bilgi dayanaklarının kullanıcı metninde birebir bulunduğu, yanıtın boş/yer tutuculu olmadığı ve karakter sınırına uyduğu denetlenir. Bilgi alanı boşken genel bir öneri oluşturulur ve arayüzde açıkça belirtilir. Model istemi verilmemiş okul, gelir, başarı veya deneyim uydurmayı yasaklar. Alıntı kontrolü, üretilen paragraftaki tüm kişisel ifadelerin anlamsal doğruluğunu kanıtlamaz; kullanıcı göndermeden önce kontrol etmelidir. Ek sorular yanıt alanının altında isteğe bağlı önerilerdir.
 
 Şema veya alıntı doğrulaması başarısızsa modelden bir kez düzeltme istenir. İkinci başarısızlıkta çıktı gösterilmez. Her model çağrısının zaman aşımı, sınırlı çıktı uzunluğu ve en fazla iki eşzamanlı işlem sınırı vardır. Yeniden deneme toplam süreyi iki katına çıkarabilir. Harici adres, ortam proxy'si, HTTP yönlendirmesi ve Ollama bulut modeli kullanımı kapalıdır.
 
@@ -177,7 +180,8 @@ FormAnaliz/
 │   ├── tests/
 │   ├── requirements.txt
 │   └── requirements.lock.txt
-├── shared/demo.json       # Frontend/backend ortak örnek ve analiz
+├── shared/demo.json       # İlk örnek burs, analiz ve soruya özel demo yanıtları
+├── shared/examples.json   # Diğer 12 başvuru, analizleri ve soruya özel demo yanıtları
 ├── samples/umut-bursu-2026.txt
 ├── e2e/                   # Masaüstü/mobil Playwright testleri
 ├── scripts/start.ps1      # Windows yerel başlatıcı
@@ -192,6 +196,6 @@ FormAnaliz/
 
 Alıntının belgede bulunması, model yorumunun anlamsal olarak doğru veya tüm gerekliliklerin eksiksiz çıkarılmış olduğunu kanıtlamaz. Kaynağı karşılaştırın. Otomatik uygunluk onayı verilmez. Başvurular kurum sistemine gönderilmez, gerekli belgelerin kendisi doğrulanmaz.
 
-Taslaklar güvenilirlik için alıntı seçimiyle sınırlıdır; serbest metin yeniden yazımı yapılmaz. Demo yalnızca kullanıcının ayrı satırlarını birleştirir ve beyanların anlamını yorumlamaz. Canlı modelin soru sorma kalitesi gerçek cihazda ayrıca denenmelidir.
+Taslaklar modelin yazdığı önerilerdir; kişisel bilgi yoksa genel amaç ifadeleri içerebilir. Model kişisel gerçekler uydurmaması için yönlendirilir, ancak bu bir doğruluk garantisi değildir. Kullanıcı tüm kişisel ifadeleri kontrol edip düzenlemelidir. Demo hazır örnek yanıtı veya kullanıcının satırlarını gösterir ve beyanların anlamını yorumlamaz. Model erişilemiyorsa canlı üretim yapılmış gibi gösterilmez.
 
 OCR yoktur. DOCX ana gövde paragrafları ve tabloları okunur; üstbilgi, dipnot, metin kutuları ve karmaşık düzenler eksik kalabilir. PDF metin okuma sırası görsel sıradan farklı olabilir. Kesin tarih ayrıştırması Türkçe veya sayısal tarihleri ve açık Türkiye saatini kapsar; diğer tarih/saat dilimleri alıntı olarak görünür ve teyit gerektirir. Kuralları belirten metin ile başvuranın kişisel bilgisi ayrı tutulur.

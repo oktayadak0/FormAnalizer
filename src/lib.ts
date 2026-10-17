@@ -1,4 +1,5 @@
 import fixture from "../shared/demo.json";
+import examples from "../shared/examples.json";
 import type {
   Analysis,
   Draft,
@@ -7,10 +8,23 @@ import type {
   Project,
   Requirement,
   TaskStatus,
+  SampleApplication,
+  QuestionExample,
+  FollowUpAnswer,
 } from "./types";
 
 export const SAMPLE_SOURCE = fixture.source;
 export const SAMPLE_ANALYSIS = fixture.analysis as Analysis;
+export const SAMPLES = [fixture, ...examples] as SampleApplication[];
+export function findSample(source: string) {
+  return SAMPLES.find((sample) => sample.source.trim() === source.trim());
+}
+export function randomSample(currentSource: string, random = Math.random) {
+  const candidates = SAMPLES.filter(
+    (sample) => sample.source.trim() !== currentSource.trim(),
+  );
+  return candidates[Math.floor(random() * candidates.length)];
+}
 export const kindLabels = {
   eligibility: "Uygunluk koşulu",
   document: "Gerekli belge",
@@ -55,6 +69,10 @@ export function newProject(): Project {
     facts: {},
     personal: {},
     answers: {},
+    answerModes: {},
+    answerKinds: {},
+    answerSuggestions: {},
+    followUpAnswers: {},
     missing: null,
   };
 }
@@ -78,7 +96,32 @@ export function demoMissing(project: Project): MissingItem[] {
       : item;
   });
 }
-export function demoDraft(personal: string, limit: number | null): Draft {
+export function draftInformation(
+  personal: string,
+  responses: Record<string, string> = {},
+) {
+  const followUpAnswers: FollowUpAnswer[] = Object.entries(responses)
+    .filter(([, answer]) => answer.trim())
+    .map(([question, answer]) => ({ question, answer: answer.trim() }));
+  const facts = [personal.trim(), ...followUpAnswers.map((item) => item.answer)]
+    .filter(Boolean)
+    .join("\n");
+  if (followUpAnswers.length > 20)
+    throw new Error(
+      "Bir form sorusu için en fazla 20 ek yanıt kullanılabilir.",
+    );
+  if (facts.length > 6000)
+    throw new Error(
+      "Kişisel bilgilerin ve ek yanıtların toplamı en fazla 6.000 karakter olabilir. Lütfen metni kısalt.",
+    );
+  return { personal_info: personal, follow_up_answers: followUpAnswers, facts };
+}
+
+export function demoDraft(
+  personal: string,
+  limit: number | null,
+  example?: QuestionExample,
+): Draft {
   const lines = personal
     .split("\n")
     .map((x) => x.trim())
@@ -86,19 +129,24 @@ export function demoDraft(personal: string, limit: number | null): Draft {
   if (lines.length < 2)
     return {
       mode: "demo",
-      answer: "",
-      follow_up_questions: [
+      answer: Array.from(
+        lines.join("\n") || example?.answer || fixture.draft_example,
+      )
+        .slice(0, limit ?? undefined)
+        .join(""),
+      follow_up_questions: example?.suggestions ?? [
         "Eğitim hedefinizi bir cümleyle yazar mısınız?",
         "Bursun bu hedefe somut katkısını ayrı bir satırda yazar mısınız?",
       ],
+      generic: !lines.length,
     };
   const answer = lines.join("\n");
   if (limit && characterCount(answer) > limit)
     return {
       mode: "demo",
-      answer: "",
+      answer: Array.from(answer).slice(0, limit).join("").trimEnd(),
       follow_up_questions: [
-        `Bilgilerinizi toplam ${limit} karaktere sığacak şekilde kısaltır mısınız?`,
+        `Yanıtınızı ${limit} karakter içinde daha iyi anlatmak için hangi bilgileri öne çıkarmak istersiniz?`,
       ],
     };
   return { mode: "demo", answer, follow_up_questions: [] };
@@ -117,6 +165,17 @@ export function deadlineLabel(iso: string | null, now = new Date()) {
     return "Bugün sona eriyor";
   const days = Math.ceil((date.getTime() - now.getTime()) / 86400000);
   return `${days} gün kaldı`;
+}
+export class ApiError extends Error {
+  constructor(
+    message: string,
+    public readonly code: string,
+    public readonly requestId?: string,
+    public readonly status?: number,
+  ) {
+    super(requestId ? `${message} [Tanı: ${requestId}]` : message);
+    this.name = "ApiError";
+  }
 }
 export async function api<T>(
   path: string,
@@ -140,16 +199,20 @@ export async function api<T>(
       signal: AbortSignal.timeout(timeout),
     });
   } catch {
-    throw new Error(
+    throw new ApiError(
       "Yerel servise ulaşılamadı veya yanıt süresi aşıldı. FastAPI servisini kontrol edin. Örnek bursu demo modunda açabilirsiniz.",
+      "backend_unreachable",
     );
   }
   const data = await response.json().catch(() => null);
   if (!response.ok || !data)
-    throw new Error(
+    throw new ApiError(
       typeof data?.detail === "string"
         ? data.detail
         : "İstek doğrulanamadı. Girdi sınırlarını ve yerel servis kurulumunu kontrol edin.",
+      data?.code ?? "request_failed",
+      data?.request_id ?? response.headers.get("x-request-id") ?? undefined,
+      response.status,
     );
   return data as T;
 }

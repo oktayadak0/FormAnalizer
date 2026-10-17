@@ -6,11 +6,18 @@ Belirsizliği açıkça belirt. Başvurunun uygun veya tamamlanmış olduğunu i
 ANALYZE = BASE + """
 Görev: Başvuru yönergesini sade Türkçeyle analiz et. Tüm koşulları, belgeleri, soruları,
 alanları, son tarihleri, gönderim adımlarını ve biçim kısıtlarını ayrı gereklilikler olarak çıkar.
-Her evidence özgün kaynaktan BİREBİR kesintisiz bir cümle olmalı. Uydurma alıntı kullanma.
-name_evidence ve purpose_evidence de birebir kaynak parçalarıdır; başlık veya amaç yoksa
-eldeki ilgili kaynak pasajından genel bir ad/amaç özeti üret ve bu belirsizliği ambiguities'e ekle.
-Çelişki ve muğlaklıkları, ilgili alıntıyla ambiguities'e ekle. Benzersiz kısa ASCII id kullan.
-character_limit yalnızca sorunun kaynağında açıkça belirtilmişse sayı, yoksa null.
+Belge passages listesinde numaralı kaynak bölümleri halinde verilmiştir. Her evidence_id,
+ilgili koşulun gerçekten yazdığı bölümün id sayısı olmalı. Alıntı metni yazma;
+uygulama özgün alıntıyı o bölümden alacak. Kaynakta olmayan bölüm numarası veya koşul üretme.
+name_evidence_id başlık/adı, purpose_evidence_id amacı destekleyen bölümü seçer.
+Başlık veya amaç yoksa ilgili kaynak bölümünden genel bir ad/amaç özeti üret ve
+bu belirsizliği ambiguities'e ekle. Her belirsizlik için de bir evidence_id seç.
+Benzersiz kısa ASCII gereklilik id kullan. Kısa ve açık açıklamalar yaz.
+kind=question: motivasyon, hedef, deneyim anlatımı veya açıklama isteyen yazılı yanıtlar.
+kind=field: ad, soyad, iletişim gibi kısa kişisel bilgi alanları. Motivasyon yazısını field sayma.
+Yalnızca metindeki gerçek çelişki veya belirsizliği ekle; belirtilmemiş ek şartlar uydurma.
+character_limit yalnızca seçilen kaynak bölümünde açıkça "N karakter" yazıyorsa sayı,
+aksi halde null. Dosya boyutu, kelime veya sayfa sınırını karakter sınırı sayma.
 deadline yalnızca gün/ay/yıl, SAAT ve Türkiye/UTC+3 saat dilimi açıkça varsa ISO8601 +03:00;
 bunlardan biri eksikse null; yine de tarih ifadesini description ve evidence içinde göster.
 Eksik saat, yıl, saat dilimi, zorunluluk veya uygunluk kararı varsayma.
@@ -28,12 +35,21 @@ Tarih veya biçim kuralına ilişkin kullanıcı işlemi bildirilmediyse missing
 """
 
 DRAFT = BASE + """
-Görev: Seçilen soruya bir taslak hazırla. Güvenilirlik için EXTRACTIVE düzenleme yap:
-excerpts alanında yalnızca personal_info içindeki BİREBİR, kesintisiz ifadeleri seç ve sırala.
-Bu ifadeler yeni satırlarla birleştirilir. Parafraz, yeni bağlaç veya kişisel iddia EKLEME.
-Toplam uzunluk (satır sonları dahil) character_limit sınırını aşmamalı.
-Yanıt için temel bilgi eksikse excerpts=[] yap ve 1–3 kısa follow_up_questions sor.
-Motivasyon sorusu için eğitim hedefi ve bursun somut katkısı gereklidir.
-Sorunun yönlendirdiği başarı/deneyim verilmediyse uydurma; takip sorusu sor.
-Bilgiler yeterliyse follow_up_questions=[] döndür. Çıktı kullanıcı onayı gerektiren öneridir.
+Seçilen form sorusuna başvuranın ağzından yeni bir yanıt yaz. Çıktı yalnızca JSON.
+answer: İKİ KISA CÜMLEYLE, yaklaşık 150–250 karakterlik tamamlanmış bir paragraf.
+question.character_limit daha küçükse o sınıra uy. Kısa ve somut yaz.
+personal_info ve follow_up_answers içindeki cevapları birlikte kullanarak yanıtı yeniden yaz.
+Ek sorulara verilen cevapları mutlaka ilgili ana sorunun yanıtına yansıt; önceki bilgileri koru.
+Ek sorular yalnızca bağlamdır, kişisel bilgi sayılmaz; kişisel bilgi cevap metinlerindedir.
+İki bilgi alanı da boşsa eğitim kaynakları, öğrenme ve gelişim gibi genel amaçlarla yanıt ver.
+Örnek kısa üslup: "Bu destek, eğitim kaynaklarına erişimimi kolaylaştırarak öğrenmeye
+odaklanmama katkı sağlayabilir. Edindiğim bilgileri uygulamaya dönüştürmek isterim."
+Genel öneriler kişisel geçmiş iddiası değildir. Verilmeyen okul, bölüm, yaş, gelir,
+not, maddi zorluk, başarı veya deneyim ekleme. Yönergedeki şartları kişisel bilgi sayma.
+Yanıt doğrudan kullanılabilir olmalı: yer tutucu, köşeli parantez, doldurma talimatı
+veya soru yerine tamamlanmış cümleler yaz. Kullanıcıdan bilgi bekleme.
+supporting_facts: Kullandığın kişisel bilgilerin personal_info veya follow_up_answers.answer
+içinden birebir alıntıları; ikisi de boşsa liste boş olmalı. Yanıtın birebir alıntı olması gerekmez.
+follow_up_questions: Yanıtı geliştirebilecek en fazla 3 kısa, isteğe bağlı soru. Kullanıcının
+cevapladığı soruları yeniden sorma. Bilgiler yeterliyse boş liste.
 """

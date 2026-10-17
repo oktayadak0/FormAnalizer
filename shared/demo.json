@@ -1,21 +1,136 @@
 {
-  "source": "Umut Bursu 2026 — Örnek Başvuru Yönergesi\nBu belge yalnızca FormDedektifi demosu için oluşturulmuş örnek veridir; gerçek bir burs ilanı değildir.\nUmut Bursu, üniversite öğrencilerinin eğitimine destek olmayı amaçlar.\nBaşvurabilmek için Türkiye'de bir üniversitede aktif lisans öğrencisi olmak gerekir.\nGenel not ortalaması 4,00 üzerinden en az 2,50 olmalıdır.\nGüncel öğrenci belgesi PDF formatında yüklenmelidir.\nGüncel transkript PDF formatında yüklenmelidir.\n“Bu burs eğitim hedeflerine nasıl katkı sağlayacak?” sorusuna en fazla 500 karakterle yanıt verilmelidir.\nAd, soyad ve e-posta adresi başvuru formunda doldurulmalıdır.\nSon başvuru tarihi 30 Kasım 2026, saat 23.59'dur (Türkiye saati).\nBaşvuru, örnek kurumun çevrim içi başvuru formu üzerinden gönderilmelidir.\nEk dosyaların toplam boyutu 10 MB'ı geçmemelidir.",
+  "draft_example": "Bu burs, eğitim kaynaklarına erişimimi kolaylaştırarak öğrenmeye daha fazla odaklanmama katkı sağlayabilir. Edindiğim bilgileri uygulamaya dönüştürmek ve kendimi geliştirmek için bu desteği değerlendirmek isterim.",
+  "source": "Umut Bursu 2026 — Örnek Başvuru Yönergesi\nBu belge yalnızca FormDedektifi demosu için oluşturulmuş örnek veridir; gerçek bir burs ilanı değildir.\nUmut Bursu, üniversite öğrencilerinin eğitimine destek olmayı amaçlar.\nBaşvurabilmek için Türkiye'de bir üniversitede aktif lisans öğrencisi olmak gerekir.\nGenel not ortalaması 4,00 üzerinden en az 2,50 olmalıdır.\nGüncel öğrenci belgesi PDF formatında yüklenmelidir.\nGüncel transkript PDF formatında yüklenmelidir.\n“Bu burs eğitim hedeflerine nasıl katkı sağlayacak?” sorusuna en fazla 500 karakterle yanıt verilmelidir.\nAd, soyad ve e-posta adresi başvuru formunda doldurulmalıdır.\nSon başvuru tarihi 30 Kasım 2026, saat 23.59'dur (Türkiye saati).\nBaşvuru, örnek kurumun çevrim içi başvuru formu üzerinden gönderilmelidir.\nEk dosyaların toplam boyutu 10 MB'ı geçmemelidir.\n“Seni bu bursa başvurmaya yönelten eğitim hedefin nedir?” sorusuna en fazla 400 karakterle yanıt verilmelidir.\n“Öğrendiğin bilgileri çevrene nasıl aktarmak istersin?” sorusuna en fazla 450 karakterle yanıt verilmelidir.",
   "analysis": {
     "name": "Umut Bursu 2026",
     "name_evidence": "Umut Bursu 2026 — Örnek Başvuru Yönergesi",
     "purpose": "Üniversite öğrencilerinin eğitimine destek sağlayan örnek burs başvurusu.",
     "purpose_evidence": "Umut Bursu, üniversite öğrencilerinin eğitimine destek olmayı amaçlar.",
     "requirements": [
-      { "id": "student", "kind": "eligibility", "description": "Aktif lisans öğrencisi olduğunu doğrula", "evidence": "Başvurabilmek için Türkiye'de bir üniversitede aktif lisans öğrencisi olmak gerekir.", "required": true, "character_limit": null, "deadline": null },
-      { "id": "gpa", "kind": "eligibility", "description": "Not ortalamanın en az 2,50 / 4,00 olduğunu doğrula", "evidence": "Genel not ortalaması 4,00 üzerinden en az 2,50 olmalıdır.", "required": true, "character_limit": null, "deadline": null },
-      { "id": "certificate", "kind": "document", "description": "Güncel öğrenci belgesi", "evidence": "Güncel öğrenci belgesi PDF formatında yüklenmelidir.", "required": true, "character_limit": null, "deadline": null },
-      { "id": "transcript", "kind": "document", "description": "Güncel transkript", "evidence": "Güncel transkript PDF formatında yüklenmelidir.", "required": true, "character_limit": null, "deadline": null },
-      { "id": "motivation", "kind": "question", "description": "Bu burs eğitim hedeflerine nasıl katkı sağlayacak?", "evidence": "“Bu burs eğitim hedeflerine nasıl katkı sağlayacak?” sorusuna en fazla 500 karakterle yanıt verilmelidir.", "required": true, "character_limit": 500, "deadline": null },
-      { "id": "identity", "kind": "field", "description": "Ad, soyad ve e-posta adresi", "evidence": "Ad, soyad ve e-posta adresi başvuru formunda doldurulmalıdır.", "required": true, "character_limit": null, "deadline": null },
-      { "id": "deadline", "kind": "deadline", "description": "30 Kasım 2026 · 23.59", "evidence": "Son başvuru tarihi 30 Kasım 2026, saat 23.59'dur (Türkiye saati).", "required": true, "character_limit": null, "deadline": "2026-11-30T23:59:00+03:00" },
-      { "id": "submission", "kind": "submission", "description": "Çevrim içi başvuru formundan gönder", "evidence": "Başvuru, örnek kurumun çevrim içi başvuru formu üzerinden gönderilmelidir.", "required": true, "character_limit": null, "deadline": null },
-      { "id": "format", "kind": "format", "description": "Ek dosyaların toplamı en fazla 10 MB", "evidence": "Ek dosyaların toplam boyutu 10 MB'ı geçmemelidir.", "required": true, "character_limit": null, "deadline": null }
+      {
+        "id": "student",
+        "kind": "eligibility",
+        "description": "Aktif lisans öğrencisi olduğunu doğrula",
+        "evidence": "Başvurabilmek için Türkiye'de bir üniversitede aktif lisans öğrencisi olmak gerekir.",
+        "required": true,
+        "character_limit": null,
+        "deadline": null
+      },
+      {
+        "id": "gpa",
+        "kind": "eligibility",
+        "description": "Not ortalamanın en az 2,50 / 4,00 olduğunu doğrula",
+        "evidence": "Genel not ortalaması 4,00 üzerinden en az 2,50 olmalıdır.",
+        "required": true,
+        "character_limit": null,
+        "deadline": null
+      },
+      {
+        "id": "certificate",
+        "kind": "document",
+        "description": "Güncel öğrenci belgesi",
+        "evidence": "Güncel öğrenci belgesi PDF formatında yüklenmelidir.",
+        "required": true,
+        "character_limit": null,
+        "deadline": null
+      },
+      {
+        "id": "transcript",
+        "kind": "document",
+        "description": "Güncel transkript",
+        "evidence": "Güncel transkript PDF formatında yüklenmelidir.",
+        "required": true,
+        "character_limit": null,
+        "deadline": null
+      },
+      {
+        "id": "motivation",
+        "kind": "question",
+        "description": "Bu burs eğitim hedeflerine nasıl katkı sağlayacak?",
+        "evidence": "“Bu burs eğitim hedeflerine nasıl katkı sağlayacak?” sorusuna en fazla 500 karakterle yanıt verilmelidir.",
+        "required": true,
+        "character_limit": 500,
+        "deadline": null
+      },
+      {
+        "id": "identity",
+        "kind": "field",
+        "description": "Ad, soyad ve e-posta adresi",
+        "evidence": "Ad, soyad ve e-posta adresi başvuru formunda doldurulmalıdır.",
+        "required": true,
+        "character_limit": null,
+        "deadline": null
+      },
+      {
+        "id": "deadline",
+        "kind": "deadline",
+        "description": "30 Kasım 2026 · 23.59",
+        "evidence": "Son başvuru tarihi 30 Kasım 2026, saat 23.59'dur (Türkiye saati).",
+        "required": true,
+        "character_limit": null,
+        "deadline": "2026-11-30T23:59:00+03:00"
+      },
+      {
+        "id": "submission",
+        "kind": "submission",
+        "description": "Çevrim içi başvuru formundan gönder",
+        "evidence": "Başvuru, örnek kurumun çevrim içi başvuru formu üzerinden gönderilmelidir.",
+        "required": true,
+        "character_limit": null,
+        "deadline": null
+      },
+      {
+        "id": "format",
+        "kind": "format",
+        "description": "Ek dosyaların toplamı en fazla 10 MB",
+        "evidence": "Ek dosyaların toplam boyutu 10 MB'ı geçmemelidir.",
+        "required": true,
+        "character_limit": null,
+        "deadline": null
+      },
+      {
+        "id": "goals",
+        "kind": "question",
+        "description": "Seni bu bursa başvurmaya yönelten eğitim hedefin nedir?",
+        "evidence": "“Seni bu bursa başvurmaya yönelten eğitim hedefin nedir?” sorusuna en fazla 400 karakterle yanıt verilmelidir.",
+        "required": true,
+        "character_limit": 400,
+        "deadline": null
+      },
+      {
+        "id": "impact",
+        "kind": "question",
+        "description": "Öğrendiğin bilgileri çevrene nasıl aktarmak istersin?",
+        "evidence": "“Öğrendiğin bilgileri çevrene nasıl aktarmak istersin?” sorusuna en fazla 450 karakterle yanıt verilmelidir.",
+        "required": true,
+        "character_limit": 450,
+        "deadline": null
+      }
     ],
     "ambiguities": []
+  },
+  "id": "umut-bursu",
+  "category": "Burs",
+  "filename": "umut-bursu-2026.txt",
+  "question_examples": {
+    "motivation": {
+      "answer": "Bu burs, eğitim kaynaklarına erişimimi kolaylaştırarak öğrenmeye daha fazla odaklanmama katkı sağlayabilir. Edindiğim bilgileri uygulamaya dönüştürmek ve kendimi geliştirmek için bu desteği değerlendirmek isterim.",
+      "suggestions": [
+        "Eğitim hedefinizi bir cümleyle yazar mısınız?",
+        "Bursun bu hedefe somut katkısını ayrı bir satırda yazar mısınız?"
+      ]
+    },
+    "goals": {
+      "answer": "Eğitimimde sağlam bir temel oluşturmak ve öğrendiklerimi uygulayarak geliştirmek istiyorum. Bu desteği öğrenme kaynaklarına erişimimi artırmak için değerlendirmeyi amaçlıyorum.",
+      "suggestions": [
+        "Bu yanıtı kendi hedefinizden bir örnekle nasıl somutlaştırabilirsiniz?"
+      ]
+    },
+    "impact": {
+      "answer": "Edindiğim bilgileri anlaşılır notlar ve küçük uygulamalarla paylaşmak isterim. Benzer hedefleri olan kişilerle birlikte öğrenerek karşılıklı gelişime katkı sağlamayı amaçlıyorum.",
+      "suggestions": [
+        "Bu yanıtı kendi hedefinizden bir örnekle nasıl somutlaştırabilirsiniz?"
+      ]
+    }
   }
 }

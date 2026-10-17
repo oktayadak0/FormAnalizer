@@ -8,11 +8,15 @@ import {
   newProject,
   SAMPLE_ANALYSIS,
   SAMPLE_SOURCE,
+  SAMPLES,
+  findSample,
+  randomSample,
+  draftInformation,
 } from "./lib";
 
 describe("source-grounded scholarship fixture", () => {
   it("preserves every supporting quote and the actual character limit", () => {
-    expect(SAMPLE_ANALYSIS.requirements).toHaveLength(9);
+    expect(SAMPLE_ANALYSIS.requirements).toHaveLength(11);
     for (const r of SAMPLE_ANALYSIS.requirements)
       expect(SAMPLE_SOURCE).toContain(r.evidence);
     expect(
@@ -30,7 +34,7 @@ describe("checklist progress", () => {
         gpa: "completed",
         unknown: "completed",
       }),
-    ).toBe(11);
+    ).toBe(9);
     expect(
       completion(
         SAMPLE_ANALYSIS.requirements,
@@ -41,16 +45,54 @@ describe("checklist progress", () => {
     ).toBe(100);
   });
 });
-describe("personal facts and draft safety", () => {
-  it("asks for essential information before the demo drafts", () => {
-    expect(demoDraft("", 500).follow_up_questions).toHaveLength(2);
-    expect(demoDraft("Tek bir bilgi.", 500).answer).toBe("");
+describe("random sample catalog", () => {
+  it("provides multiple form questions and source evidence in every example", () => {
+    expect(SAMPLES.length).toBeGreaterThanOrEqual(13);
+    for (const sample of SAMPLES) {
+      const questions = sample.analysis.requirements.filter(
+        (r) => r.kind === "question",
+      );
+      expect(questions.length).toBeGreaterThanOrEqual(3);
+      expect(findSample(sample.source)?.id).toBe(sample.id);
+      for (const requirement of sample.analysis.requirements)
+        expect(sample.source).toContain(requirement.evidence);
+      for (const question of questions) {
+        const example = sample.question_examples[question.id];
+        expect(example.answer.length).toBeLessThanOrEqual(
+          question.character_limit!,
+        );
+        expect(demoDraft("", question.character_limit, example).answer).toBe(
+          example.answer,
+        );
+      }
+    }
   });
-  it("preserves user statements and refuses to truncate excess characters", () => {
+  it("never immediately repeats the current example", () => {
+    for (const sample of SAMPLES) {
+      expect(randomSample(sample.source, () => 0).id).not.toBe(sample.id);
+      expect(randomSample(sample.source, () => 0.9999).id).not.toBe(sample.id);
+    }
+    expect(findSample(SAMPLES[0].source + " Değiştirildi.")).toBeUndefined();
+  });
+});
+describe("personal facts and draft safety", () => {
+  it("shows a fixed demo example or available facts alongside optional suggestions", () => {
+    expect(demoDraft("", 500).follow_up_questions).toHaveLength(2);
+    expect(demoDraft("", 500).answer).toContain("Bu burs");
+    expect(demoDraft("", 500).answer).not.toContain("[");
+    expect(demoDraft("Tek bir bilgi.", 500).answer).toBe("Tek bir bilgi.");
+    expect(demoDraft("Tek bir bilgi.", 500).follow_up_questions).toHaveLength(
+      2,
+    );
+  });
+  it("preserves user statements within the character limit", () => {
     const info =
       "Mühendislik eğitimimi geliştirmek istiyorum.\nBursu kitaplar için kullanacağım.";
     expect(demoDraft(info, 500).answer).toBe(info);
-    expect(demoDraft("a".repeat(500) + "\nb", 500).answer).toBe("");
+    expect(demoDraft("a".repeat(500) + "\nb", 500).answer).toBe(
+      "a".repeat(500),
+    );
+    expect(characterCount(demoDraft("🎓".repeat(501), 500).answer)).toBe(500);
     expect(characterCount("İğüşçö 🎓")).toBe(8);
   });
   it("never interprets arbitrary demo text as confirmed eligibility", () => {
@@ -101,5 +143,27 @@ describe("deadline alerts", () => {
       ),
     ).toBe("Bugün sona eriyor");
     expect(deadlineLabel(null)).toContain("doğrulanmalı");
+  });
+});
+
+describe("follow-up answer context", () => {
+  it("keeps original information and adds answers without treating questions as facts", () => {
+    const context = draftInformation("Bursu kitaplar için kullanacağım.", {
+      "Üç ödül kazandınız mı?": "Hayır.",
+      "Hedefiniz nedir?": " Python öğrenmek istiyorum. ",
+      "Boş yanıt": "   ",
+    });
+    expect(context.personal_info).toBe("Bursu kitaplar için kullanacağım.");
+    expect(context.follow_up_answers).toHaveLength(2);
+    expect(context.facts).toBe(
+      "Bursu kitaplar için kullanacağım.\nHayır.\nPython öğrenmek istiyorum.",
+    );
+    expect(context.facts).not.toContain("ödül");
+    expect(demoDraft(context.facts, 500).answer).toBe(context.facts);
+  });
+  it("rejects excessive combined information without truncating user answers", () => {
+    expect(() =>
+      draftInformation("a".repeat(5500), { "Hedefiniz?": "b".repeat(1000) }),
+    ).toThrow("6.000");
   });
 });

@@ -126,7 +126,7 @@ try {
     $env:OLLAMA_HOST = $config.BaseUrl
     Invoke-Native $ollama @('pull', $config.Model) 'Gemma 4 indirmesi'
     Write-Host '[6/6] Modelden gercek yanit bekleniyor (cihaza gore zaman alabilir)...'
-    $payload = @{ model = $config.Model; stream = $false; format = 'json'; messages = @(@{ role = 'user'; content = 'Return exactly this JSON: {"ok":true}' }); options = @{ temperature = 0; num_predict = 64; num_ctx = 2048 } } | ConvertTo-Json -Depth 6
+    $payload = @{ model = $config.Model; stream = $false; think = $false; format = 'json'; messages = @(@{ role = 'user'; content = 'Return exactly this JSON: {"ok":true}' }); options = @{ temperature = 0; num_predict = 128; num_ctx = 2048 } } | ConvertTo-Json -Depth 6
     $result = Invoke-RestMethod -Uri ($config.BaseUrl + '/api/chat') -Method Post -ContentType 'application/json' -Body $payload -TimeoutSec 300
     $reply = $result.message.content | ConvertFrom-Json
     if ($reply.ok -ne $true) { throw 'Gemma 4 yaniti dogrulanamadi.' }
