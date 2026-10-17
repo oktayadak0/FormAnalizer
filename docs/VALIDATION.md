@@ -25,3 +25,14 @@ Pytest sonucunda bir **başarısızlığa neden olmayan Starlette TestClient/htt
 Kalan ürün sınırları: yalnızca oturum belleğinde başvuru saklama, OCR bulunmaması, DOCX üstbilgi/dipnot/metin kutularının kapsam dışında olması, alıntı doğrulamasının anlamsal doğruluğu garanti etmemesi ve yanıtların güvenilirlik amacıyla kullanıcı ifadelerinden seçilip sıralanması. Başvuru gönderimi, belge doğrulaması ve otomatik uygunluk onayı yoktur. Ayrıntılar README'dedir.
 
 ![FormDedektifi çalışma alanı](preview.png)
+
+## BAT kurucu ve başlatıcı kontrolleri
+
+`installer.bat` ve `run.bat`, 17 Ekim 2026 tarihinde ayrıca doğrulandı:
+
+- Türkçe ve boşluk içeren ayrı klasörde Node.js 22 LTS otomatik indirildi, SHA256 kontrolü geçti ve bağımlılıklar kuruldu.
+- Mevcut sistem Python'u için sanal ortam kurulumu ve sistem Python'u PATH'ten kaldırıldığında Python 3.13.16 embeddable indirmesi/pip kurulumu ayrı ayrı başarıyla çalıştı.
+- Her iki kurulumda üretim derlemesi geçti. Tekrarlanan kurulum, özelleştirilmiş `.env` dosyasının SHA256 değerini değiştirmedi.
+- Yeni indirilen Node.js 22.23.3 ve Python 3.13.16 ile `run.bat -NoBrowser -SmokeTest`, backend ve frontend HTTP yanıtlarını alıp kendi servislerini kapattı.
+- Ana klasörde ve `FormAnalizer` Git kopyasında bağımlılık kontrolü ve başlatma kontrolü geçti. Zaten çalışan arayüz kullanıldı; eksik backend başlatıldı. İkinci başlatıcı ek servis açmadı.
+- Bu testlerde `-Demo` kullanılarak büyük Ollama/Gemma 4 indirmesi atlandı. Tam AI indirme ve gerçek çıkarım yolu bu doğrulama kapsamına dahil değildir.

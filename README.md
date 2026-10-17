@@ -4,6 +4,15 @@
 
 Hacktoberfest Elazığ 2026 için hazırlanmış, Türkçe arayüzlü ve MIT lisanslı yerel başvuru asistanı. React + Vite + TypeScript + Tailwind CSS arayüzü; FastAPI + Pydantic backend'i; Ollama üzerinde **Gemma 4** kullanır. Örnek burs akışı, model veya backend kurulmadan da çalışır.
 
+## Windows'ta çift tıklayarak kurulum
+
+1. **`installer.bat`** dosyasına çift tıklayın. Eksik Node.js/npm ve Python araçlarını proje içine kurar; uygulama bağımlılıklarını yükler, `.env` yoksa oluşturur, arayüzü derler. Ardından Ollama ve `.env` içinde seçilen yerel Gemma 4 modelini indirip gerçek model yanıtını kontrol eder. Mevcut `.env` üzerine yazılmaz. İlk kurulum internet ve model için birkaç GB boş alan gerektirir.
+2. Kurulumdan sonra **`run.bat`** dosyasına çift tıklayın. Backend, arayüz ve gerekiyorsa yerel Ollama başlatılır; servisler hazır olunca tarayıcı otomatik açılır. Pencere açık kalsın; **Ctrl+C** uygulamanın başlattığı servisleri durdurur. Zaten çalışan harici Ollama servisi kapatılmaz.
+
+Model indirmeden yalnızca uygulamayı kurmak için terminalde `installer.bat -Demo` kullanın. Sonrasında `run.bat` ile örnek bursu demo seçeneğiyle açabilirsiniz. `run.bat -Demo` yalnızca arayüzü başlatır. `run.bat`, eksik uygulama bağımlılıklarını otomatik tamamlar; eksik AI modelini sessizce indirmez.
+
+Yeni araçlar ve kurucunun başlattığı Ollama'nın model dosyaları `.tools/` altında tutulur; sistemin kalıcı PATH ayarı değiştirilmez. Zaten çalışan Ollama kullanılıyorsa indirme o servisin model klasörüne yapılır. Windows x64 desteklenir. Ayrıntılar ve tanılama seçenekleri: [Windows kurulum rehberi](docs/WINDOWS.md).
+
 ## Hızlı başlangıç
 
 Node.js 22.12+ (güncel 22 LTS önerilir), npm ve Python 3.12+ kurulu olmalı. Komutları proje kökünde çalıştırın.
