@@ -5,8 +5,10 @@ import {
   deadlineLabel,
   demoDraft,
   demoMissing,
+  demoProfile,
   newProject,
   SAMPLE_ANALYSIS,
+  SAMPLE_PROFILE_DOCUMENTS,
   SAMPLE_SOURCE,
   SAMPLES,
   findSample,
@@ -166,4 +168,20 @@ describe("follow-up answer context", () => {
       draftInformation("a".repeat(5500), { "Hedefiniz?": "b".repeat(1000) }),
     ).toThrow("6.000");
   });
+  it("extracts grounded user profile from uploaded documents and supplies profile facts to drafts", () => {
+    const profile = demoProfile(SAMPLE_PROFILE_DOCUMENTS);
+    expect(profile.items.length).toBeGreaterThanOrEqual(4);
+    for (const item of profile.items) {
+      expect(SAMPLE_PROFILE_DOCUMENTS[0].text).toContain(item.evidence);
+      expect(item.source_file).toBe("ozgecmis-notlari.txt");
+    }
+    const question = SAMPLE_ANALYSIS.requirements.find(
+      (r) => r.kind === "question",
+    );
+    const context = draftInformation("", {}, profile, question);
+    expect(context.profile_facts.length).toBeGreaterThanOrEqual(4);
+    expect(context.facts).toContain("Bilgisayar Mühendisliği");
+    expect(demoDraft(context.facts, 500).generic).toBeFalsy();
+  });
 });
+

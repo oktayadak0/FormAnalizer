@@ -41,7 +41,7 @@ class RequestLogging:
         start = time.monotonic()
         path = scope.get("path", "")
         # Never log arbitrary URL parameters or a user-supplied path.
-        route = path if path in {"/api/analyze", "/api/draft", "/api/missing", "/api/documents", "/api/status", "/api/diagnostics", "/api/runtime", "/openapi.json"} else "other"
+        route = path if path in {"/api/analyze", "/api/profile", "/api/draft", "/api/missing", "/api/documents", "/api/status", "/api/diagnostics", "/api/runtime", "/openapi.json"} else "other"
         status = 500
         logger.info("request.start method=%s route=%s", scope.get("method", ""), route)
 

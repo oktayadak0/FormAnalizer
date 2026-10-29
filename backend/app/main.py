@@ -11,10 +11,10 @@ from starlette.middleware.trustedhost import TrustedHostMiddleware
 from . import prompts
 from .ai import AIError, AIService
 from .config import ROOT, Settings
-from .demo import demo_analysis, demo_draft, demo_missing
+from .demo import demo_analysis, demo_draft, demo_missing, demo_profile
 from .documents import MAX_FILE_SIZE, extract_document
-from .grounding import assemble_draft, resolve_analysis, source_units, validate_grounding, validate_missing
-from .schemas import AnalyzeRequest, DraftRequest, MissingRequest, MissingResult, ReferencedAnalysis, draft_schema
+from .grounding import assemble_draft, profile_units, resolve_analysis, resolve_profile, source_units, validate_grounding, validate_missing
+from .schemas import AnalyzeRequest, DraftRequest, MissingRequest, MissingResult, ProfileRequest, ReferencedAnalysis, ReferencedUserProfile, draft_schema
 from .observability import RequestLogging, logger, request_id
 
 app = FastAPI(title="FormDedektifi", version="1.0.0")
@@ -67,7 +67,7 @@ async def validation_error_handler(request, error):
 
 @app.exception_handler(RequestValidationError)
 async def input_error_handler(request, error):
-    allowed = {"source", "demo", "analysis", "requirements", "facts", "personal_info", "follow_up_answers", "question", "answer", "requirement_id", "character_limit", "evidence", "text", "not_applicable"}
+    allowed = {"source", "demo", "analysis", "requirements", "facts", "personal_info", "follow_up_answers", "profile_facts", "documents", "filename", "question", "answer", "requirement_id", "character_limit", "evidence", "text", "not_applicable"}
     fields = sorted({str(e["loc"][-1]) if str(e["loc"][-1]) in allowed else "other" for e in error.errors()})
     logger.warning("request.validation_error kind=input fields=%s", ",".join(fields))
     return JSONResponse(status_code=422, content={"detail": "Girdi sınırlarını kontrol edin: " + ", ".join(fields), "code": "invalid_input", "request_id": request_id.get()})
@@ -136,6 +136,21 @@ async def analyze(request: AnalyzeRequest):
     return {"analysis": resolve_analysis(result, units, request.source), "mode": "live"}
 
 
+@app.post("/api/profile")
+async def profile(request: ProfileRequest):
+    units = profile_units(request.documents)
+    if not units:
+        raise HTTPException(422, "Profil belgelerinde analiz edilebilecek yeterli metin bulunamadı.")
+    logger.info("profile.request mode=%s files=%d passages=%d", "demo" if request.demo else "live", len(request.documents), len(units))
+    if request.demo:
+        return {"profile": demo_profile(request).model_dump(), "mode": "demo"}
+    async with model_slot():
+        result = await ai.structured(ReferencedUserProfile, prompts.PROFILE,
+            {"passages": units},
+            lambda result: resolve_profile(result, units))
+    return {"profile": resolve_profile(result, units).model_dump(), "mode": "live"}
+
+
 @app.post("/api/missing")
 async def missing(request: MissingRequest):
     check_context(request)
@@ -150,7 +165,7 @@ async def missing(request: MissingRequest):
 @app.post("/api/draft")
 async def draft(request: DraftRequest):
     facts = request.personal_facts()
-    logger.info("draft.request mode=%s personal_characters=%d answered_questions=%d", "demo" if request.demo else "live", len(facts), len(request.follow_up_answers))
+    logger.info("draft.request mode=%s personal_characters=%d profile_facts=%d answered_questions=%d", "demo" if request.demo else "live", len(facts), len(request.profile_facts), len(request.follow_up_answers))
     check_context(request)
     question = next((r for r in request.analysis.requirements if r.id == request.requirement_id and r.kind == "question"), None)
     if not question:
@@ -160,6 +175,11 @@ async def draft(request: DraftRequest):
     async with model_slot():
         selection = await ai.structured(draft_schema(facts, question.character_limit), prompts.DRAFT,
             {"question": question.model_dump(mode="json"), "personal_info": request.personal_info,
+             "profile_facts": request.profile_facts,
              "follow_up_answers": [item.model_dump() for item in request.follow_up_answers]},
             lambda result: assemble_draft(result, facts, question.character_limit))
-    return {**assemble_draft(selection, facts, question.character_limit), "mode": "live"}
+    payload = assemble_draft(selection, facts, question.character_limit)
+    answered = {item.question.strip() for item in request.follow_up_answers if item.answer.strip()}
+    payload["follow_up_questions"] = [q for q in payload["follow_up_questions"] if q.strip() not in answered]
+    return {**payload, "mode": "live"}
+

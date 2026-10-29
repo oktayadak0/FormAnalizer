@@ -10,3 +10,21 @@ pytest-cache-files-*/
 *.tsbuildinfo
 test-results/
 playwright-report/
+
+# Local configuration and credentials
+.env.*
+!.env.example
+*.pem
+*.key
+*.p12
+*.pfx
+
+# Personal documents and local exports
+private/
+uploads/
+local-data/
+FormDedektifi-github.zip
+
+# OS metadata
+.DS_Store
+Thumbs.db

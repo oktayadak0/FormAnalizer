@@ -56,6 +56,29 @@ export type Draft = {
   generic?: boolean;
 };
 export type FollowUpAnswer = { question: string; answer: string };
+export type ProfileCategory =
+  | "education"
+  | "experience"
+  | "project"
+  | "skill"
+  | "achievement"
+  | "goal"
+  | "other";
+export type ProfileDocument = {
+  filename: string;
+  text: string;
+};
+export type ProfileItem = {
+  category: ProfileCategory;
+  label: string;
+  detail: string;
+  source_file: string;
+  evidence: string;
+};
+export type UserProfile = {
+  summary: string;
+  items: ProfileItem[];
+};
 export type Project = {
   id: string;
   source: string;
@@ -70,6 +93,9 @@ export type Project = {
   answerKinds?: Record<string, "generic" | "personal">;
   answerSuggestions?: Record<string, string[]>;
   followUpAnswers?: Record<string, Record<string, string>>;
+  profileFiles?: ProfileDocument[];
+  profile?: UserProfile | null;
+  profileMode?: "demo" | "live";
   missing: MissingItem[] | null;
 };
 export type AIStatus = {
@@ -84,3 +110,4 @@ export type AIStatus = {
   model_installed?: boolean | null;
   inference_verified?: boolean;
 };
+

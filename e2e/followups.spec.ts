@@ -112,6 +112,9 @@ test("answered suggestions revise only their own draft and remain editable after
     await expect(
       first.getByLabel(questions[index], { exact: true }),
     ).toHaveValue(replies[index]);
+  await first.getByLabel(questions[0], { exact: true }).fill("");
+  await expect(first.getByLabel(questions[0], { exact: true })).toBeVisible();
+  await first.getByLabel(questions[0], { exact: true }).fill(replies[0]);
   await update.click();
   await expect(page.getByRole("alert")).toContainText("followup-error-42");
   await expect(first.getByLabel("Düzenlenebilir yanıt")).toHaveValue(revised);
@@ -127,3 +130,122 @@ test("answered suggestions revise only their own draft and remain editable after
   ).toEqual([]);
   expect(calls).toBe(3);
 });
+
+test("uploaded profile files are analyzed into a user profile and used to write question answers", async ({
+  page,
+}) => {
+  await page.addInitScript(() => {
+    Math.random = () => 0;
+  });
+  await page.route("**/api/status", (route) =>
+    route.fulfill({
+      json: {
+        state: "connected",
+        label: "Gemma 4 Bağlı",
+        model: "gemma4:e2b",
+        detail: "Test",
+      },
+    }),
+  );
+  await page.route("**/api/profile", async (route) => {
+    const body = route.request().postDataJSON();
+    expect(body.documents).toHaveLength(2);
+    expect(body.documents[0].filename).toBe("ozgecmis.txt");
+    expect(body.documents[1].filename).toBe("projeler.txt");
+    await route.fulfill({
+      json: {
+        mode: "live",
+        profile: {
+          summary:
+            "Bilgisayar Mühendisliği 3. sınıf öğrencisi; Python ve FastAPI ile açık kaynak eğitim araçları geliştiriyor.",
+          items: [
+            {
+              category: "education",
+              label: "Bilgisayar Mühendisliği Eğitimi",
+              detail:
+                "Örnek Üniversite Bilgisayar Mühendisliği 3. sınıf öğrencisiyim.",
+              source_file: "ozgecmis.txt",
+              evidence:
+                "Eğitim: Örnek Üniversite Bilgisayar Mühendisliği 3. sınıf öğrencisiyim.",
+            },
+            {
+              category: "project",
+              label: "Açık Kaynak Eğitim Aracı",
+              detail:
+                "Python ve FastAPI ile açık kaynak başvuru analiz aracı geliştirdim.",
+              source_file: "projeler.txt",
+              evidence:
+                "Proje: Python ve FastAPI ile açık kaynak başvuru analiz aracı geliştirdim.",
+            },
+          ],
+        },
+      },
+    });
+  });
+  await page.route("**/api/draft", async (route) => {
+    const body = route.request().postDataJSON();
+    expect(body.profile_facts).toContain(
+      "Örnek Üniversite Bilgisayar Mühendisliği 3. sınıf öğrencisiyim.",
+    );
+    expect(body.profile_facts).toContain(
+      "Python ve FastAPI ile açık kaynak başvuru analiz aracı geliştirdim.",
+    );
+    await route.fulfill({
+      json: {
+        answer: `Profil yanıtı (${body.requirement_id}): Bilgisayar Mühendisliği 3. sınıf öğrencisi olarak Python ve FastAPI ile açık kaynak eğitim araçları geliştiriyorum.`,
+        mode: "live",
+        generic: false,
+        follow_up_questions: [],
+      },
+    });
+  });
+  await page.goto("/");
+  await page.getByLabel("Profil dosyası ekle").setInputFiles([
+    {
+      name: "ozgecmis.txt",
+      mimeType: "text/plain",
+      buffer: Buffer.from(
+        "Eğitim: Örnek Üniversite Bilgisayar Mühendisliği 3. sınıf öğrencisiyim.",
+      ),
+    },
+    {
+      name: "projeler.txt",
+      mimeType: "text/plain",
+      buffer: Buffer.from(
+        "Proje: Python ve FastAPI ile açık kaynak başvuru analiz aracı geliştirdim.",
+      ),
+    },
+  ]);
+  await expect(page.getByText("ozgecmis.txt")).toBeVisible();
+  await expect(page.getByText("projeler.txt")).toBeVisible();
+  await page.getByRole("button", { name: "Profilimi Analiz Et" }).click();
+  await expect(
+    page.getByText("Bilgisayar Mühendisliği Eğitimi"),
+  ).toBeVisible();
+  await expect(page.getByText("Açık Kaynak Eğitim Aracı")).toBeVisible();
+  await page.getByRole("button", { name: /Önce bir örnekle tanış/ }).click();
+  await page.getByLabel("Önceden hazırlanmış demo sonuçlarını kullan").check();
+  await page.getByRole("button", { name: "Başvurumu Analiz Et" }).click();
+  await page.getByRole("tab", { name: "Yanıt asistanı" }).click();
+  await expect(
+    page.getByText("Bilgisayar Mühendisliği Eğitimi"),
+  ).toBeVisible();
+  await page
+    .getByRole("button", { name: "Profilimle tüm yanıtları oluştur" })
+    .click();
+  const first = page.getByRole("article", {
+    name: "1. form sorusu",
+    exact: true,
+  });
+  await expect(first.getByLabel("Düzenlenebilir yanıt")).toContainText(
+    "Bilgisayar Mühendisliği 3. sınıf öğrencisi olarak Python ve FastAPI",
+  );
+  expect(
+    (
+      await new AxeBuilder({ page })
+        .withTags(["wcag2a", "wcag2aa", "wcag21aa"])
+        .analyze()
+    ).violations,
+  ).toEqual([]);
+});
+

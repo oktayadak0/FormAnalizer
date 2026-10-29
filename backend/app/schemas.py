@@ -107,18 +107,74 @@ class FollowUpAnswer(Schema):
     answer: str = Field(min_length=1, max_length=1500)
 
 
+ProfileCategory = Literal["education", "experience", "project", "skill", "achievement", "goal", "other"]
+
+
+class ProfileDocumentInput(Schema):
+    filename: str = Field(min_length=1, max_length=200)
+    text: str = Field(min_length=10, max_length=20000)
+
+
+class ProfileRequest(Schema):
+    documents: list[ProfileDocumentInput] = Field(min_length=1, max_length=10)
+    demo: bool = False
+
+    @model_validator(mode="after")
+    def validate_total_length(self):
+        if sum(len(doc.text) for doc in self.documents) > 40000:
+            raise ValueError("Profil belgeleri toplam en fazla 40.000 karakter olabilir.")
+        return self
+
+
+class ProfileItem(Schema):
+    category: ProfileCategory
+    label: str = Field(min_length=1, max_length=160)
+    detail: str = Field(min_length=1, max_length=600)
+    source_file: str = Field(min_length=1, max_length=200)
+    evidence: str = Field(min_length=5, max_length=2000)
+
+
+class UserProfile(Schema):
+    summary: str = Field(min_length=1, max_length=1200)
+    items: list[ProfileItem] = Field(min_length=1, max_length=30)
+
+
+class ReferencedProfileItem(Schema):
+    category: ProfileCategory
+    label: str = Field(min_length=1, max_length=160)
+    detail: str = Field(min_length=1, max_length=600)
+    evidence_id: int = Field(ge=0)
+
+
+class ReferencedUserProfile(Schema):
+    summary: str = Field(min_length=1, max_length=1200)
+    items: list[ReferencedProfileItem] = Field(min_length=1, max_length=30)
+
+
 class DraftRequest(ContextRequest):
     requirement_id: str = Field(max_length=80)
     personal_info: str = Field(max_length=6000)
     follow_up_answers: list[FollowUpAnswer] = Field(default_factory=list, max_length=20)
+    profile_facts: list[Annotated[str, Field(min_length=1, max_length=1500)]] = Field(default_factory=list, max_length=30)
 
     def personal_facts(self):
-        return "\n".join(part for part in [self.personal_info, *[item.answer for item in self.follow_up_answers]] if part)
+        return "\n".join(
+            part
+            for part in [
+                self.personal_info,
+                *self.profile_facts,
+                *[item.answer for item in self.follow_up_answers],
+            ]
+            if part
+        )
 
     @model_validator(mode="after")
     def combined_information_limit(self):
-        if len(self.personal_facts()) > 6000:
+        direct_facts = "\n".join(part for part in [self.personal_info, *[item.answer for item in self.follow_up_answers]] if part)
+        if len(direct_facts) > 6000:
             raise ValueError("Kişisel bilgiler ve ek yanıtlar toplam en fazla 6.000 karakter olmalıdır.")
+        if len(self.personal_facts()) > 12000:
+            raise ValueError("Kişisel bilgiler, profil ve ek yanıtlar toplam en fazla 12.000 karakter olmalıdır.")
         return self
 
 
@@ -137,3 +193,4 @@ def draft_schema(personal_info: str, limit: int | None):
 
 class Ping(Schema):
     ok: Literal[True]
+

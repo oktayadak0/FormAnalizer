@@ -11,11 +11,38 @@ import type {
   SampleApplication,
   QuestionExample,
   FollowUpAnswer,
+  ProfileCategory,
+  ProfileDocument,
+  ProfileItem,
+  UserProfile,
 } from "./types";
 
 export const SAMPLE_SOURCE = fixture.source;
 export const SAMPLE_ANALYSIS = fixture.analysis as Analysis;
 export const SAMPLES = [fixture, ...examples] as SampleApplication[];
+// Fictional profile for the demo; does not describe a real person.
+export const SAMPLE_PROFILE_DOCUMENTS: ProfileDocument[] = [
+  {
+    filename: "ozgecmis-notlari.txt",
+    text: [
+      "Bu belge yalnızca demo için hazırlanmış kurgusal bir profildir.",
+      "Eğitim: Bilgisayar Mühendisliği öğrencisiyim.",
+      "Proje: Python ile örnek bir kütüphane takip uygulaması geliştirdim.",
+      "Deneyim: Üniversite açık kaynak topluluğunda gönüllü eğitmen olarak temel yazılım atölyeleri düzenledim.",
+      "Beceri: Python, TypeScript, React, veri analizi ve doğal dil işleme araçlarıyla çalışıyorum.",
+      "Hedef: Yapay zekâ ve doğal dil işleme alanında araştırmalar yaparak erişilebilir eğitim teknolojileri üretmek istiyorum.",
+    ].join("\n"),
+  },
+];
+export const profileCategoryLabels: Record<ProfileCategory, string> = {
+  education: "Eğitim",
+  experience: "Deneyim",
+  project: "Proje",
+  skill: "Beceri",
+  achievement: "Başarı",
+  goal: "Hedef",
+  other: "Ek bilgi",
+};
 export function findSample(source: string) {
   return SAMPLES.find((sample) => sample.source.trim() === source.trim());
 }
@@ -73,6 +100,9 @@ export function newProject(): Project {
     answerKinds: {},
     answerSuggestions: {},
     followUpAnswers: {},
+    profileFiles: [],
+    profile: null,
+    profileMode: "live",
     missing: null,
   };
 }
@@ -96,26 +126,148 @@ export function demoMissing(project: Project): MissingItem[] {
       : item;
   });
 }
+function classifyProfileLine(text: string): {
+  category: ProfileCategory;
+  defaultLabel: string;
+} {
+  const low = text.replace(/I/g, "ı").replace(/İ/g, "i").toLowerCase();
+  if (
+    /üniversite|fakülte|bölüm|lisans|lise|mezun|öğrenci|gano|gno|not ortalaması|sınıf|eğitim/.test(
+      low,
+    )
+  )
+    return { category: "education", defaultLabel: "Eğitim Bilgisi" };
+  if (/staj|çalışt|deneyim|şirket|kurum|görev|asistan|gönüllü/.test(low))
+    return { category: "experience", defaultLabel: "Deneyim" };
+  if (
+    /proje|geliştird|uygulama|sistem|platform|araç|github|açık kaynak|tasarlad/.test(
+      low,
+    )
+  )
+    return { category: "project", defaultLabel: "Proje" };
+  if (
+    /python|javascript|typescript|java|c\+\+|sql|react|fastapi|dil|ingilizce|beceri|yetkinlik/.test(
+      low,
+    )
+  )
+    return { category: "skill", defaultLabel: "Beceri ve Yetkinlik" };
+  if (
+    /ödül|derece|birinci|ikinci|üçüncü|başarı|burs|sertifika|hackathon|finalist/.test(
+      low,
+    )
+  )
+    return { category: "achievement", defaultLabel: "Başarı ve Sertifika" };
+  if (/hedef|amaç|plan|motivasyon|istiyorum|kariyer|gelecek/.test(low))
+    return { category: "goal", defaultLabel: "Hedef ve Motivasyon" };
+  return { category: "other", defaultLabel: "Profil Notu" };
+}
+export function demoProfile(documents: ProfileDocument[]): UserProfile {
+  const items: ProfileItem[] = [];
+  for (const doc of documents) {
+    const lines = doc.text
+      .split(/\n+/)
+      .map((line) => line.trim())
+      .filter((line) => line.length >= 6);
+    for (const line of lines) {
+      if (items.length >= 15) break;
+      const { category, defaultLabel } = classifyProfileLine(line);
+      const colonIndex = line.indexOf(":");
+      const label =
+        colonIndex > 0
+          ? line.slice(0, colonIndex).trim().slice(0, 160) || defaultLabel
+          : defaultLabel;
+      const detail =
+        colonIndex > 0
+          ? line.slice(colonIndex + 1).trim().slice(0, 600) || line.slice(0, 600)
+          : line.slice(0, 600);
+      items.push({
+        category,
+        label,
+        detail,
+        source_file: doc.filename,
+        evidence: line.slice(0, 2000),
+      });
+    }
+  }
+  if (!items.length)
+    throw new Error("Profil belgelerinde analiz edilebilecek yeterli metin bulunamadı.");
+  const summary = items
+    .slice(0, 3)
+    .map((item) => item.detail.replace(/\.*$/, "."))
+    .join(" ")
+    .slice(0, 1200);
+  return { summary, items };
+}
+export function profileFactsForQuestion(
+  profile?: UserProfile | null,
+  question?: Requirement,
+): string[] {
+  if (!profile?.items.length) return [];
+  const qText = (question?.description ?? "")
+    .replace(/I/g, "ı")
+    .replace(/İ/g, "i")
+    .toLowerCase();
+  const preferred: ProfileCategory[] = /hedef|gelecek|plan|motivasyon|neden|katkı/.test(
+    qText,
+  )
+    ? ["goal", "education", "project", "experience", "skill", "achievement", "other"]
+    : /topluluk|çevre|aktar|paylaş|gönüllü|etki|sosyal/.test(qText)
+      ? ["experience", "project", "goal", "education", "skill", "achievement", "other"]
+      : ["project", "experience", "skill", "education", "achievement", "goal", "other"];
+  const sorted = [...profile.items].sort(
+    (a, b) => preferred.indexOf(a.category) - preferred.indexOf(b.category),
+  );
+  return [
+    ...new Set(
+      sorted
+        .map((item) => item.detail.trim())
+        .filter(Boolean),
+    ),
+  ].slice(0, 15);
+}
 export function draftInformation(
   personal: string,
   responses: Record<string, string> = {},
+  profile?: UserProfile | null,
+  question?: Requirement,
 ) {
   const followUpAnswers: FollowUpAnswer[] = Object.entries(responses)
     .filter(([, answer]) => answer.trim())
-    .map(([question, answer]) => ({ question, answer: answer.trim() }));
-  const facts = [personal.trim(), ...followUpAnswers.map((item) => item.answer)]
+    .map(([questionText, answer]) => ({
+      question: questionText,
+      answer: answer.trim(),
+    }));
+  const profileFacts = profileFactsForQuestion(profile, question);
+  const directFacts = [
+    personal.trim(),
+    ...followUpAnswers.map((item) => item.answer),
+  ]
     .filter(Boolean)
     .join("\n");
   if (followUpAnswers.length > 20)
     throw new Error(
       "Bir form sorusu için en fazla 20 ek yanıt kullanılabilir.",
     );
-  if (facts.length > 6000)
+  if (directFacts.length > 6000)
     throw new Error(
       "Kişisel bilgilerin ve ek yanıtların toplamı en fazla 6.000 karakter olabilir. Lütfen metni kısalt.",
     );
-  return { personal_info: personal, follow_up_answers: followUpAnswers, facts };
+  const facts = [
+    personal.trim(),
+    ...profileFacts,
+    ...followUpAnswers.map((item) => item.answer),
+  ]
+    .filter(Boolean)
+    .join("\n")
+    .slice(0, 12000);
+  return {
+    personal_info: personal,
+    follow_up_answers: followUpAnswers,
+    profile_facts: profileFacts,
+    facts,
+  };
 }
+
 
 export function demoDraft(
   personal: string,

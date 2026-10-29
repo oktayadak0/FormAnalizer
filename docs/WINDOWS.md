@@ -52,7 +52,7 @@ Yalnızca frontend gerekiyorsa `run.bat -Demo` kullanın.
 - Arayüz hatasının `[Tanı: ...]` numarası, backend kaydındaki `request=...` ile aynıdır.
 - `model_missing`: seçili etiket indirilmemiş; `ollama_unreachable`: yerel servis erişilemiyor; `ollama_timeout`: süre aşıldı; `model_output_invalid`: şema/kaynak doğrulaması geçmedi.
 
-Başlatıcı, `/api/runtime` üzerinden çalışan backend'in gerçek klasörünü öğrenir. Örneğin `FormAnalizer` içinden başlatılıp üst klasördeki backend kullanılıyorsa o backend'in logları izlenir. UTF-8 JSON yolları Windows PowerShell 5'te de Türkçe klasör adlarıyla okunur. Başlatıcı eski `ONCEKI` kayıtlarını tekrar basmaz; yalnızca yeni olayları gösterir. Daha önceki testlerden kalan Ollama port hatası yeni bir hata gibi gösterilmez.
+Başlatıcı, `/api/runtime` üzerinden çalışan backend'in gerçek klasörünü öğrenir. Başka bir proje kopyası çalışıyorsa o backend'in logları izlenir. UTF-8 JSON yolları Windows PowerShell 5'te de Türkçe klasör adlarıyla okunur. Başlatıcı eski `ONCEKI` kayıtlarını tekrar basmaz; yalnızca yeni olayları gösterir. Daha önceki testlerden kalan Ollama port hatası yeni bir hata gibi gösterilmez.
 
 Özel PDF analizinde kaynak alıntıları modelin yeniden yazdığı metinden değil, modelin seçtiği özgün belge bölümlerinden alınır. Böylece PDF'deki satır kırılmaları ve bölünmez boşluklar kaynak doğrulamasını bozmaz. Geçersiz bölüm numarası veya kaynakta desteklenmeyen limit/tarih güvenli hata kodlarıyla loglanır. Analiz sürerken bağlantı kontrolü ek bir model çağrısı başlatmaz. Küçük belgeler 8192 bağlamla işlenir; analiz düğmesinde geçen süre görünür. Dosya yükledikten sonra **Başvurumu Analiz Et** düğmesine basın.
 
@@ -63,8 +63,6 @@ run.bat -RestartBackend
 ```
 
 Başka bir projeye ait işlem doğrulanmadan kapatılmaz. Önceden açılmış servisler normal çalıştırmada korunur; konsol yeni kayıtları izlemeye devam eder. Kontrol karakterleri temizlenir ve aşırı uzun satırlar kısaltılır.
-
-17 Ekim 2026 son tanısında bilgisayarda `gemma4:e2b` bulunurken `.env` E4B istiyordu. İki yerel proje kopyasının `.env` dosyası kurulu E2B modeline ayarlandı. Yerel API adresinde Windows'un IPv6 öncelemesinden kaynaklanabilecek gecikmeyi önlemek için `127.0.0.1` kullanıldı. Model başka bir aileyle değiştirilmedi.
 
 Gemma 4'ün düşünme modu, kısa JSON sağlık kontrolünün çıktı sınırını tüketebildiği için yapılandırılmış çağrılarda açıkça `think:false` kullanılır. Sağlık ve taslak çağrıları aynı 8192 token bağlamını kullanarak gereksiz model yeniden yüklemesini azaltır. Paralel sağlık kontrolleri tek bir model probunu paylaşır ve kullanıcı taslak slotlarını tüketmez.
 

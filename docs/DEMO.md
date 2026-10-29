@@ -1,34 +1,12 @@
-# Üç dakikalık jüri sunumu
+# Demo akışı
 
-**0:00 — Sorun (20 sn)**
+1. **Örnek ekle** ile kurgusal bir başvuru açın. **Önceden hazırlanmış demo sonuçlarını kullan** seçeneğini işaretleyip analizi başlatın.
+2. Gereklilikleri, belge listesini, soruları ve son tarihi inceleyin. Bir gerekliliğin **Kaynak cümlesini gör** alanını açın.
+3. Kontrol listesindeki bir görevin durumunu değiştirin. İlerleme yüzdesi, kullanıcının işaretlediği görevleri yansıtır.
+4. **Eksik bilgiler** sekmesinde bir beyan ekleyip koşullarla karşılaştırın. Demo, serbest metnin anlamından uygunluk onayı çıkarmaz.
+5. **Yanıt asistanı** sekmesine geçin. Model olmadan deniyorsanız gerçek Gemma 4 seçeneğini kapatın. Her sorunun ayrı taslak ve düzenleme alanı vardır.
+6. **Örnek profil dosyası ekle** ve **Profilimi Analiz Et** ile kurgusal profil bilgilerini çıkarın. Maddelerin kaynak dosyalarını ve alıntılarını inceleyin.
+7. Taslak oluşturun; takip sorularını yanıtlayıp **Yanıtlarımla taslağı güncelle** seçeneğini deneyin. Karakter sayacını ve kopyalama düğmesini kontrol edin.
+8. İşiniz bitince verileri temizleyin. Sayfayı yenilemek de sekme belleğindeki başvuruları siler.
 
-“Bir burs başvurusunda bir belgeyi veya tek bir karakter sınırını kaçırmak kolay. FormDedektifi, uzun yönergeleri kaynakları görünen bir yol haritasına çeviriyor.”
-
-**0:20 — Kaynağı ekle (25 sn)**
-
-Örnek bursu açın. Belgenin gerçek ilan olmadığını gösterin. Model bağlıysa demo kutusunu kapatıp canlı analiz yapın; değilse “Şu anda açıkça etiketlenmiş, önceden hazırlanmış demo sonuçlarını kullanıyorum” deyin.
-
-**0:45 — Gereklilikleri gör (35 sn)**
-
-Aktif lisans öğrenciliği, 2,50 not ortalaması, öğrenci belgesi, transkript, 500 karakterlik motivasyon sorusu ve 30 Kasım 2026 son tarihini gösterin. Bir “Kaynak cümlesini gör” bağlantısını açın. “Her alıntıyı kaynakta birebir arıyoruz; model yorumunu yine kullanıcı kontrol ediyor.”
-
-**1:20 — Eksikleri bul (30 sn)**
-
-Öğrenci belgesini “Devam ediyor”, sonra “Tamamlandı” yapın. Yüzde değişimini gösterin. “Bu, kişisel iş listesi ilerlemesi; kurumun başvuruyu onayladığı anlamına gelmiyor.” Eksik bilgilerde öğrenci beyanı yazıp karşılaştırın. Uygunluğun otomatik onaylanmadığını belirtin.
-
-**1:50 — Yanıt hazırla (45 sn)**
-
-Yanıt asistanında bilgi yazmadan taslak isteyin. Takip sorularını gösterin. Ardından kendi örnek beyanınızı iki satır halinde yazın:
-
-```text
-Yazılım mühendisliği alanında eğitimimi geliştirmek istiyorum.
-Bu bursu ders kitapları ve eğitim materyalleri için kullanacağım.
-```
-
-Taslağı oluşturun. Demo kullanılıyorsa bunun iki satırı birleştiren bir düzenleme olduğunu söyleyin. Canlı modda Gemma 4 yalnızca verilen ifadeleri seçip sıralar; yeni kişisel bilgi ekleyemez. Sayacı, düzenlemeyi ve kopyalamayı gösterin.
-
-**2:35 — Yerel mimari (25 sn)**
-
-“React arayüzü → yerel FastAPI → Ollama / Gemma 4. Ayrı görev istemleri ve Pydantic JSON şemaları var. Kaynak ve kişisel bilgi alıntılarını doğruluyoruz. Model yoksa bağlı demiyoruz. Veriler sekme belleğinde; dış servise belge göndermiyoruz.”
-
-Verileri temizleyerek bitirin. MIT lisansını ve testleri gösterin.
+Canlı analiz için yerel Ollama ve desteklenen Gemma 4 modeli gerekir. Demo sonuçları hazır örneklerdir; gerçek model çıktısı olarak değerlendirilmemelidir.

@@ -42,12 +42,16 @@ import {
   deadlineLabel,
   demoDraft,
   demoMissing,
+  demoProfile,
   draftInformation,
   infoLabels,
   initialMissing,
   kindLabels,
   newProject,
+  profileCategoryLabels,
+  profileFactsForQuestion,
   SAMPLES,
+  SAMPLE_PROFILE_DOCUMENTS,
   findSample,
   randomSample,
   statusLabels,
@@ -58,9 +62,11 @@ import type {
   Draft,
   Fact,
   MissingItem,
+  ProfileDocument,
   Project,
   Requirement,
   TaskStatus,
+  UserProfile,
 } from "./types";
 
 type Tab = "overview" | "source" | "missing" | "answers";
@@ -247,6 +253,9 @@ export default function App() {
       source: nextSample.source,
       filename: nextSample.filename,
       mode: ai.state === "connected" ? "live" : "demo",
+      profileFiles: project.profileFiles ?? [],
+      profile: project.profile ?? null,
+      profileMode: project.profileMode ?? "live",
     });
     setTab("overview");
     setError("");
@@ -255,6 +264,40 @@ export default function App() {
       `${nextSample.analysis.name} örneği eklendi. 3 form sorusu hazır; analizi başlatabilirsiniz.`,
     );
     setLiveDraft(true);
+  }
+  async function readFileText(file: File, minChars = 30): Promise<string> {
+    if (
+      !/\.(txt|pdf|docx)$/i.test(file.name) ||
+      file.size > 5 * 1024 * 1024 ||
+      !file.size
+    )
+      throw new Error(
+        "Boş olmayan TXT, PDF veya DOCX dosyası seçin. En fazla 5 MB.",
+      );
+    let text: string;
+    if (/\.txt$/i.test(file.name)) {
+      const buffer = await file.arrayBuffer();
+      const bytes = new Uint8Array(buffer);
+      text = new TextDecoder(
+        bytes[0] === 255 && bytes[1] === 254
+          ? "utf-16le"
+          : bytes[0] === 254 && bytes[1] === 255
+            ? "utf-16be"
+            : "utf-8",
+        { fatal: true },
+      )
+        .decode(bytes)
+        .trim();
+      if (text.includes("\0"))
+        throw new Error("Geçerli bir metin dosyası seçin.");
+    } else {
+      const form = new FormData();
+      form.append("file", file);
+      text = (await api<{ text: string }>("documents", form)).text;
+    }
+    if (characterCount(text) < minChars || characterCount(text) > 40000)
+      throw new Error(`Belge ${minChars}–40.000 karakter arasında olmalıdır.`);
+    return text;
   }
   async function analyze() {
     const version = ++actionVersion.current;
@@ -349,37 +392,7 @@ export default function App() {
     setError("");
     setBusy("upload");
     try {
-      if (
-        !/\.(txt|pdf|docx)$/i.test(file.name) ||
-        file.size > 5 * 1024 * 1024 ||
-        !file.size
-      )
-        throw new Error(
-          "Boş olmayan TXT, PDF veya DOCX dosyası seçin. En fazla 5 MB.",
-        );
-      let text: string;
-      if (/\.txt$/i.test(file.name)) {
-        const buffer = await file.arrayBuffer();
-        const bytes = new Uint8Array(buffer);
-        text = new TextDecoder(
-          bytes[0] === 255 && bytes[1] === 254
-            ? "utf-16le"
-            : bytes[0] === 254 && bytes[1] === 255
-              ? "utf-16be"
-              : "utf-8",
-          { fatal: true },
-        )
-          .decode(bytes)
-          .trim();
-        if (text.includes("\0"))
-          throw new Error("Geçerli bir metin dosyası seçin.");
-      } else {
-        const form = new FormData();
-        form.append("file", file);
-        text = (await api<{ text: string }>("documents", form)).text;
-      }
-      if (characterCount(text) < 30 || characterCount(text) > 40000)
-        throw new Error("Belge 30–40.000 karakter arasında olmalıdır.");
+      const text = await readFileText(file, 30);
       patch({
         source: text,
         filename: file.name,
@@ -396,6 +409,93 @@ export default function App() {
         missing: null,
       });
       setNotice("Belge metni yerel olarak okundu. Analizi başlatabilirsiniz.");
+    } catch (e) {
+      setError((e as Error).message);
+    } finally {
+      setBusy("");
+    }
+  }
+  async function uploadProfileFiles(fileList: FileList | null) {
+    if (!fileList?.length || busy) return;
+    setError("");
+    setBusy("profile-upload");
+    try {
+      const existing = [...(project.profileFiles ?? [])];
+      for (const file of Array.from(fileList)) {
+        const text = (await readFileText(file, 10)).slice(0, 20000);
+        const index = existing.findIndex((item) => item.filename === file.name);
+        if (index >= 0) existing[index] = { filename: file.name, text };
+        else existing.push({ filename: file.name, text });
+      }
+      if (existing.length > 10)
+        throw new Error("Profil için en fazla 10 dosya ekleyebilirsiniz.");
+      if (existing.reduce((sum, item) => sum + item.text.length, 0) > 40000)
+        throw new Error(
+          "Profil dosyalarının toplam metni 40.000 karakteri aşamaz.",
+        );
+      patch({ profileFiles: existing, profile: null });
+      setNotice(
+        `${fileList.length} profil dosyası eklendi. "Profilimi Analiz Et" ile kullanıcı profilini çıkarabilirsiniz.`,
+      );
+    } catch (e) {
+      setError((e as Error).message);
+    } finally {
+      setBusy("");
+    }
+  }
+  function loadSampleProfile() {
+    if (busy) return;
+    setError("");
+    patch({
+      profileFiles: structuredClone(SAMPLE_PROFILE_DOCUMENTS),
+      profile: null,
+    });
+    setNotice(
+      "Örnek profil dosyası eklendi. 'Profilimi Analiz Et' düğmesiyle kullanıcı profilini çıkarabilirsiniz.",
+    );
+  }
+  function removeProfileFile(filename: string) {
+    if (busy) return;
+    const remaining = (project.profileFiles ?? []).filter(
+      (item) => item.filename !== filename,
+    );
+    patch({ profileFiles: remaining, profile: null });
+  }
+  async function runProfileExtraction(
+    files: ProfileDocument[],
+    useDemoMode: boolean,
+  ): Promise<{ profile: UserProfile; mode: "demo" | "live" }> {
+    if (!files.length)
+      throw new Error("Önce en az bir profil dosyası ekleyin.");
+    if (useDemoMode)
+      return { profile: demoProfile(files), mode: "demo" };
+    return await api<{ profile: UserProfile; mode: "demo" | "live" }>(
+      "profile",
+      { documents: files, demo: false },
+    );
+  }
+  async function analyzeProfile() {
+    if (busy) return;
+    const files = project.profileFiles ?? [];
+    if (!files.length) {
+      setError("Önce en az bir profil dosyası ekleyin.");
+      return;
+    }
+    const targetProjectId = project.id;
+    setError("");
+    setBusy("profile");
+    try {
+      const result = await runProfileExtraction(files, draftUsesDemo);
+      patch(
+        {
+          profile: result.profile,
+          profileMode: result.mode,
+        },
+        targetProjectId,
+      );
+      setNotice(
+        "Kullanıcı profili çıkarıldı. Yanıt asistanı bu bilgilere göre taslak hazırlayacak.",
+      );
     } catch (e) {
       setError((e as Error).message);
     } finally {
@@ -436,6 +536,66 @@ export default function App() {
       setBusy("");
     }
   }
+  async function generateDraftForQuestion(
+    question: Requirement,
+    activeProfile: UserProfile | null,
+    targetProjectId: string,
+  ) {
+    const information = draftInformation(
+      project.personal[question.id] ?? "",
+      project.followUpAnswers?.[question.id],
+      activeProfile,
+      question,
+    );
+    const result = draftUsesDemo
+      ? demoDraft(
+          information.facts,
+          question.character_limit,
+          sample?.question_examples[question.id],
+        )
+      : await api<Draft>("draft", {
+          source: project.source,
+          analysis,
+          demo: false,
+          requirement_id: question.id,
+          personal_info: information.personal_info,
+          profile_facts: information.profile_facts,
+          follow_up_answers: information.follow_up_answers,
+        });
+    setProjects((current) =>
+      current.map((currentProject) => {
+        if (currentProject.id !== targetProjectId) return currentProject;
+        const answeredQuestions = Object.keys(
+          currentProject.followUpAnswers?.[question.id] ?? {},
+        ).filter((key) =>
+          currentProject.followUpAnswers?.[question.id]?.[key]?.trim(),
+        );
+        const mergedSuggestions = [
+          ...new Set([...answeredQuestions, ...result.follow_up_questions]),
+        ];
+        return {
+          ...currentProject,
+          answers: {
+            ...currentProject.answers,
+            [question.id]: result.answer,
+          },
+          answerModes: {
+            ...currentProject.answerModes,
+            [question.id]: result.mode,
+          },
+          answerKinds: {
+            ...currentProject.answerKinds,
+            [question.id]: result.generic ? "generic" : "personal",
+          },
+          answerSuggestions: {
+            ...currentProject.answerSuggestions,
+            [question.id]: mergedSuggestions,
+          },
+        };
+      }),
+    );
+    return result;
+  }
   async function makeDraft(question: Requirement) {
     if (busy) return;
     const targetProjectId = project.id;
@@ -443,48 +603,22 @@ export default function App() {
     setDraftQuestionId(question.id);
     setBusy("draft");
     try {
-      const information = draftInformation(
-        project.personal[question.id] ?? "",
-        project.followUpAnswers?.[question.id],
-      );
-      const result = draftUsesDemo
-        ? demoDraft(
-            information.facts,
-            question.character_limit,
-            sample?.question_examples[question.id],
-          )
-        : await api<Draft>("draft", {
-            source: project.source,
-            analysis,
-            demo: false,
-            requirement_id: question.id,
-            personal_info: information.personal_info,
-            follow_up_answers: information.follow_up_answers,
-          });
-      setProjects((current) =>
-        current.map((currentProject) =>
-          currentProject.id !== targetProjectId
-            ? currentProject
-            : {
-                ...currentProject,
-                answers: {
-                  ...currentProject.answers,
-                  [question.id]: result.answer,
-                },
-                answerModes: {
-                  ...currentProject.answerModes,
-                  [question.id]: result.mode,
-                },
-                answerKinds: {
-                  ...currentProject.answerKinds,
-                  [question.id]: result.generic ? "generic" : "personal",
-                },
-                answerSuggestions: {
-                  ...currentProject.answerSuggestions,
-                  [question.id]: result.follow_up_questions,
-                },
-              },
-        ),
+      let activeProfile = project.profile ?? null;
+      if (!activeProfile && (project.profileFiles?.length ?? 0) > 0) {
+        const extracted = await runProfileExtraction(
+          project.profileFiles ?? [],
+          draftUsesDemo,
+        );
+        activeProfile = extracted.profile;
+        patch(
+          { profile: extracted.profile, profileMode: extracted.mode },
+          targetProjectId,
+        );
+      }
+      const result = await generateDraftForQuestion(
+        question,
+        activeProfile,
+        targetProjectId,
       );
       if (result.answer)
         setNotice(
@@ -518,6 +652,42 @@ export default function App() {
           code: e.code,
         }));
       }
+    } finally {
+      setBusy("");
+      setDraftQuestionId("");
+    }
+  }
+  async function makeAllDraftsWithProfile() {
+    if (busy || !questions.length) return;
+    const targetProjectId = project.id;
+    setError("");
+    setBusy("profile-drafts");
+    try {
+      let activeProfile = project.profile ?? null;
+      if (!activeProfile) {
+        const extracted = await runProfileExtraction(
+          project.profileFiles ?? [],
+          draftUsesDemo,
+        );
+        activeProfile = extracted.profile;
+        patch(
+          { profile: extracted.profile, profileMode: extracted.mode },
+          targetProjectId,
+        );
+      }
+      for (const question of questions) {
+        setDraftQuestionId(question.id);
+        await generateDraftForQuestion(
+          question,
+          activeProfile,
+          targetProjectId,
+        );
+      }
+      setNotice(
+        "Tüm form soruları kullanıcı profilinize göre yanıtlandı. Göndermeden önce kontrol edin.",
+      );
+    } catch (e) {
+      setError((e as Error).message);
     } finally {
       setBusy("");
       setDraftQuestionId("");
@@ -565,6 +735,152 @@ export default function App() {
         ],
       },
     });
+  }
+
+  function renderProfileSection(headingLevel: 2 | 3) {
+    const profileFiles = project.profileFiles ?? [];
+    const extractedProfile = project.profile ?? null;
+    const HeadingTag = headingLevel === 2 ? "h2" : "h3";
+    return (
+      <section
+        className="card profile-card"
+        aria-label="Kullanıcı profili ve belgeleri"
+      >
+        <div className="profile-header">
+          <div>
+            <span className="section-kicker">KULLANICI PROFİLİ</span>
+            <HeadingTag>Dosyalardan kullanıcı profili çıkar</HeadingTag>
+            <p>
+              Özgeçmiş, transkript, niyet mektubu veya proje notlarını (TXT,
+              PDF, DOCX) ekle. Dosyalarından profilini analiz edip başvuru
+              yanıtlarını bu bilgilere göre yazalım.
+            </p>
+          </div>
+          <div className="profile-toolbar">
+            <label className={`upload-link ${busy ? "disabled" : ""}`}>
+              <UploadCloud size={15} /> Profil dosyası ekle
+              <input
+                aria-label="Profil dosyası ekle"
+                type="file"
+                multiple
+                accept=".txt,.pdf,.docx"
+                disabled={!!busy}
+                onChange={(e) => {
+                  void uploadProfileFiles(e.target.files);
+                  e.target.value = "";
+                }}
+              />
+            </label>
+            <button
+              type="button"
+              className="button secondary compact"
+              disabled={!!busy}
+              onClick={loadSampleProfile}
+            >
+              <FileText size={14} /> Örnek profil dosyası ekle
+            </button>
+            <button
+              type="button"
+              className="button primary compact"
+              disabled={!!busy || !profileFiles.length}
+              onClick={() => void analyzeProfile()}
+            >
+              {busy === "profile" ? (
+                <LoaderCircle size={15} className="spin" />
+              ) : (
+                <Sparkles size={15} />
+              )}
+              {busy === "profile"
+                ? `Profil analiz ediliyor · ${waitSeconds} sn`
+                : "Profilimi Analiz Et"}
+            </button>
+          </div>
+        </div>
+
+        {profileFiles.length > 0 && (
+          <div className="profile-file-list" aria-label="Eklenen profil dosyaları">
+            {profileFiles.map((doc) => (
+              <div className="profile-file-chip" key={doc.filename}>
+                <FileText size={14} />
+                <strong>{doc.filename}</strong>
+                <span>{characterCount(doc.text)} karakter</span>
+                <button
+                  type="button"
+                  className="icon-button"
+                  disabled={!!busy}
+                  aria-label={`${doc.filename} dosyasını kaldır`}
+                  onClick={() => removeProfileFile(doc.filename)}
+                >
+                  <X size={14} />
+                </button>
+              </div>
+            ))}
+          </div>
+        )}
+
+        {extractedProfile && (
+          <div className="profile-result" aria-label="Çıkarılan kullanıcı profili">
+            <div className="profile-summary-box">
+              <div className="profile-summary-title">
+                <ShieldCheck size={15} />
+                <strong>
+                  Çıkarılan kullanıcı profili (
+                  {project.profileMode === "demo"
+                    ? "Demo analizi"
+                    : "Gemma 4 analizi"}
+                  )
+                </strong>
+                <span>{extractedProfile.items.length} bilgi maddesi</span>
+              </div>
+              <p>{extractedProfile.summary}</p>
+            </div>
+            <div className="profile-items-grid">
+              {extractedProfile.items.map((item, idx) => (
+                <div
+                  className="profile-item-card"
+                  key={`${item.source_file}-${item.label}-${idx}`}
+                >
+                  <div className="profile-item-meta">
+                    <span className="profile-cat-badge">
+                      {profileCategoryLabels[item.category]}
+                    </span>
+                    <span className="profile-source-tag">
+                      {item.source_file}
+                    </span>
+                  </div>
+                  <strong>{item.label}</strong>
+                  <p>{item.detail}</p>
+                  <Evidence text={item.evidence} />
+                </div>
+              ))}
+            </div>
+            {analysis && questions.length > 0 && (
+              <div className="profile-actions">
+                <span>
+                  Profil bilgilerin yanıt asistanındaki form sorularına otomatik
+                  olarak uygulanır.
+                </span>
+                <button
+                  type="button"
+                  className="button primary compact"
+                  disabled={!!busy}
+                  onClick={() => void makeAllDraftsWithProfile()}
+                >
+                  {busy === "profile-drafts" ? (
+                    <LoaderCircle size={15} className="spin" />
+                  ) : (
+                    <Sparkles size={15} />
+                  )}
+                  {busy === "profile-drafts"
+                    ? `Yanıtlar hazırlanıyor · ${waitSeconds} sn`
+                    : "Profilimle tüm yanıtları oluştur"}
+                </button>
+              </div>
+            )}
+          </div>
+        )}
+      </section>
+    );
   }
 
   return (
@@ -783,6 +1099,7 @@ export default function App() {
             )}
 
             {!analysis ? (
+              <>
               <section className="input-card card">
                 <div className="card-heading">
                   <div>
@@ -894,6 +1211,8 @@ export default function App() {
                   </button>
                 </div>
               </section>
+              {renderProfileSection(2)}
+              </>
             ) : (
               <>
                 <section className="application-heading">
@@ -1214,6 +1533,7 @@ export default function App() {
                               </button>
                             </div>
                           </div>
+                          {renderProfileSection(3)}
                           <div className="answer-list-heading">
                             <h3>Form soruları</h3>
                             <p>
@@ -1242,7 +1562,7 @@ export default function App() {
                                 responses,
                               ).filter((value) => value.trim()).length;
                               const isGenerating =
-                                busy === "draft" &&
+                                (busy === "draft" || busy === "profile-drafts") &&
                                 draftQuestionId === question.id;
                               return (
                                 <article
@@ -1273,9 +1593,9 @@ export default function App() {
                                       Yanıtına hangi bilgileri ekleyelim?
                                     </label>
                                     <p>
-                                      İstersen hedefini ve eklemek istediğin
-                                      bilgileri yaz. Boş bırakırsan Gemma 4
-                                      soruya uygun genel bir yanıt önerir.
+                                      {project.profile
+                                        ? `Çıkarılan kullanıcı profilindeki ${profileFactsForQuestion(project.profile, question).length} bilgi maddesi bu yanıta otomatik eklenir. İstersen aşağıya ek not da yazabilirsin.`
+                                        : "İstersen hedefini ve eklemek istediğin bilgileri yaz veya yukarıdan profil dosyalarını ekle. Boş bırakırsan Gemma 4 soruya uygun genel bir yanıt önerir."}
                                     </p>
                                     <textarea
                                       id={`personal-${question.id}`}

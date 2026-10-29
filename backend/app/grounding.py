@@ -1,7 +1,16 @@
 import re
 from datetime import datetime, timedelta, timezone
 
-from .schemas import Analysis, GeneratedDraft, MissingRequest, MissingResult, ReferencedAnalysis
+from .schemas import (
+    Analysis,
+    GeneratedDraft,
+    MissingRequest,
+    MissingResult,
+    ProfileDocumentInput,
+    ReferencedAnalysis,
+    ReferencedUserProfile,
+    UserProfile,
+)
 
 
 MONTHS = ["ocak", "şubat", "mart", "nisan", "mayıs", "haziran", "temmuz", "ağustos", "eylül", "ekim", "kasım", "aralık"]
@@ -161,8 +170,25 @@ class DraftValidationError(ValueError):
         self.code = code
 
 
+def _norm_fact(text: str) -> str:
+    return " ".join(text.replace("I", "ı").replace("İ", "i").lower().split()).strip(".,!?;:\"'()[]{}")
+
+
+def _fact_verified(fact: str, personal_info: str) -> bool:
+    norm_fact = _norm_fact(fact)
+    norm_personal = _norm_fact(personal_info)
+    if not norm_fact or not norm_personal:
+        return False
+    if fact in personal_info or norm_fact in norm_personal:
+        return True
+    words = [w for w in re.findall(r"\w+", norm_fact) if len(w) >= 3]
+    if len(words) >= 2 and all(w[:5] in norm_personal for w in words):
+        return True
+    return False
+
+
 def assemble_draft(result: GeneratedDraft, personal_info: str, limit: int | None) -> dict:
-    if any(not fact.strip() or fact not in personal_info for fact in result.supporting_facts):
+    if any(not _fact_verified(fact, personal_info) for fact in result.supporting_facts):
         raise DraftValidationError("Kişisel bilgi dayanağı kullanıcı beyanında bulunamadı.", "draft_unverified_fact")
     answer = result.answer.strip()
     if not answer or re.search(r"\[[^\]\n]*\]", answer):
@@ -174,3 +200,48 @@ def assemble_draft(result: GeneratedDraft, personal_info: str, limit: int | None
     return {"answer": answer, "follow_up_questions": result.follow_up_questions,
             "character_count": len(answer), "character_limit": limit,
             "method": "generated", "generic": not bool(personal_info.strip()), "review_required": True}
+
+
+def profile_units(documents: list[ProfileDocumentInput]) -> list[dict]:
+    passages: list[dict] = []
+    for doc in documents:
+        raw_lines = [line.strip() for line in re.split(r"\n+", doc.text) if len(line.strip()) >= 6]
+        if not raw_lines and len(doc.text.strip()) >= 6:
+            raw_lines = [doc.text.strip()[:900]]
+        for line in raw_lines:
+            start = 0
+            while len(line) - start > 600:
+                cut = line.rfind(" ", start + 8, start + 600)
+                cut = cut if cut > start else start + 600
+                chunk = line[start:cut].strip()
+                if len(chunk) >= 6:
+                    passages.append({"id": len(passages), "filename": doc.filename, "text": chunk})
+                start = cut
+                if len(passages) >= 80:
+                    return passages
+            tail = line[start:].strip()
+            if len(tail) >= 6:
+                passages.append({"id": len(passages), "filename": doc.filename, "text": tail})
+                if len(passages) >= 80:
+                    return passages
+    return passages
+
+
+def resolve_profile(result: ReferencedUserProfile, passages: list[dict]) -> UserProfile:
+    if not passages:
+        raise SourceValidationError("Profil belgelerinde yeterli metin bulunamadı.", "profile_empty")
+    data = result.model_dump(mode="json")
+    resolved_items = []
+    for item in data["items"]:
+        idx = item.pop("evidence_id")
+        if idx >= len(passages):
+            raise SourceValidationError("Modelin seçtiği profil bölümü belgede bulunamadı.", "profile_reference_invalid")
+        passage = passages[idx]
+        resolved_items.append({
+            **item,
+            "source_file": passage["filename"],
+            "evidence": passage["text"],
+        })
+    data["items"] = resolved_items
+    return UserProfile.model_validate(data)
+

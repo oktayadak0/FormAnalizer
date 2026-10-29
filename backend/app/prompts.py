@@ -38,18 +38,36 @@ DRAFT = BASE + """
 Seçilen form sorusuna başvuranın ağzından yeni bir yanıt yaz. Çıktı yalnızca JSON.
 answer: İKİ KISA CÜMLEYLE, yaklaşık 150–250 karakterlik tamamlanmış bir paragraf.
 question.character_limit daha küçükse o sınıra uy. Kısa ve somut yaz.
-personal_info ve follow_up_answers içindeki cevapları birlikte kullanarak yanıtı yeniden yaz.
+personal_info, profile_facts ve follow_up_answers içindeki bilgileri birlikte kullanarak yanıtı yaz.
+profile_facts içindeki kullanıcı profilinden bu soruyla ilgili eğitim, deneyim, proje, beceri,
+başarı veya hedefleri seçip başvuranın ağzından doğal biçimde yanıta yansıt.
 Ek sorulara verilen cevapları mutlaka ilgili ana sorunun yanıtına yansıt; önceki bilgileri koru.
-Ek sorular yalnızca bağlamdır, kişisel bilgi sayılmaz; kişisel bilgi cevap metinlerindedir.
-İki bilgi alanı da boşsa eğitim kaynakları, öğrenme ve gelişim gibi genel amaçlarla yanıt ver.
+Ek sorular yalnızca bağlamdır, kişisel bilgi sayılmaz; kişisel bilgi personal_info, profile_facts ve cevap metinlerindedir.
+Tüm bilgi alanları boşsa eğitim kaynakları, öğrenme ve gelişim gibi genel amaçlarla yanıt ver.
 Örnek kısa üslup: "Bu destek, eğitim kaynaklarına erişimimi kolaylaştırarak öğrenmeye
 odaklanmama katkı sağlayabilir. Edindiğim bilgileri uygulamaya dönüştürmek isterim."
 Genel öneriler kişisel geçmiş iddiası değildir. Verilmeyen okul, bölüm, yaş, gelir,
 not, maddi zorluk, başarı veya deneyim ekleme. Yönergedeki şartları kişisel bilgi sayma.
 Yanıt doğrudan kullanılabilir olmalı: yer tutucu, köşeli parantez, doldurma talimatı
 veya soru yerine tamamlanmış cümleler yaz. Kullanıcıdan bilgi bekleme.
-supporting_facts: Kullandığın kişisel bilgilerin personal_info veya follow_up_answers.answer
-içinden birebir alıntıları; ikisi de boşsa liste boş olmalı. Yanıtın birebir alıntı olması gerekmez.
+supporting_facts: Kullandığın kişisel bilgilerin personal_info, profile_facts veya follow_up_answers.answer
+içinden birebir alıntıları; tümü boşsa liste boş olmalı. Yanıtın birebir alıntı olması gerekmez.
 follow_up_questions: Yanıtı geliştirebilecek en fazla 3 kısa, isteğe bağlı soru. Kullanıcının
-cevapladığı soruları yeniden sorma. Bilgiler yeterliyse boş liste.
+cevapladığı veya profilinde zaten bulunan bilgileri yeniden sorma. Bilgiler yeterliyse boş liste.
 """
+
+PROFILE = BASE + """
+Görev: Kullanıcının yüklediği belgelerden (özgeçmiş, transkript, niyet mektubu, proje veya notlar)
+doğrulanmış bir kullanıcı profili çıkar. Çıktı yalnızca JSON.
+Belgeler passages listesinde numaralı bölümler (id, filename, text) olarak verilmiştir.
+summary: Kullanıcının eğitimini, odak alanlarını, deneyimlerini ve hedeflerini yalnızca belgelere
+dayanarak 1–2 cümleyle özetle. Belgede olmayan hiçbir bilgiyi uydurma.
+items: Belgedeki somut kişisel bilgileri maddeler halinde çıkar.
+category: education (eğitim/okul/bölüm/not), experience (iş/staj/gönüllülük deneyimi),
+project (projeler/geliştirilen çalışmalar), skill (teknik/dil/araç becerileri),
+achievement (ödül/başarı/sertifika/burs), goal (hedef/motivasyon/gelecek planı), other (diğer).
+label: Kısa başlık (ör. "Bilgisayar Mühendisliği Eğitimi", "Açık Kaynak NLP Projesi").
+detail: Başvuru yanıtlarında doğrudan kullanılabilecek net ve somut bilgi cümlesi.
+evidence_id: Bu bilginin geçtiği passages bölümünün tam id numarası. Geçersiz id kullanma.
+"""
+
